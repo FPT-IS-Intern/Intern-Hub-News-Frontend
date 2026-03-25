@@ -39,7 +39,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKERHUB_REGISTRY }}/internhub-v2/dev/auth-mfe
+          images: ${{ secrets.DOCKERHUB_REGISTRY }}/internhub-v2/dev/news-mfe
           tags: |
             type=raw,value=latest
 
