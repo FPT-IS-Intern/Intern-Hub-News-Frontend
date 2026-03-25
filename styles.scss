@@ -1,0 +1,10 @@
+@use 'dynamic-ds/src/lib/styles/system-design';
+@import 'quill/dist/quill.snow.css';
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: var(--neutral-color-10);
+  color: var(--neutral-color-800);
+}

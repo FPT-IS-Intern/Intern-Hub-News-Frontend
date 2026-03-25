@@ -1,0 +1,52 @@
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000; // Higher than loading overlay (1000)
+  backdrop-filter: blur(2px);
+}
+
+.confirm-modal-container {
+  background: white;
+  width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.confirm-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--neutral-color-100);
+  background: white;
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--neutral-color-900);
+  }
+}
+
+.confirm-modal-body {
+  padding: 24px 20px;
+}
+
+.confirm-content {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--neutral-color-800);
+  margin: 0;
+}
+
+.confirm-modal-footer {
+  padding: 16px 20px;
+  background: var(--neutral-color-25);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid var(--neutral-color-100);
+}

@@ -1,0 +1,6 @@
+@if (loading) {
+  <div>Loading...</div>
+}
+@if (!loading) {
+  <ul>@for (item of news; track item.id) {<li><h3>{{ item.title }}</h3><p>{{ item.body }}</p><span>Topics: {{ getTopicNames(item) }}</span><span>Status: {{ item.status }}</span></li>}@empty {<li>Không có tin tức nào để hiển thị.</li>}</ul>
+}

@@ -1,0 +1,21 @@
+@if (news) {
+  <div class="news-detail-wrapper">
+    <div class="news-header-meta">
+      <div class="meta-pill">
+        Admin, {{ createdAtDate | date: 'dd/MM/yyyy , HH:mm:ss' }}
+      </div>
+    </div>
+    
+    <h1 class="news-title color-text-neutral-strong">{{ news.title }}</h1>
+    
+    @if (news.thumbNail) {
+      <div class="news-thumbnail-wrapper">
+        <img [src]="news.thumbNail" alt="Thumbnail" class="news-thumbnail w-100 rounded-md" />
+      </div>
+    }
+    
+    <div class="news-content-body color-text-neutral-sub">
+      {{ news.body }}
+    </div>
+  </div>
+}

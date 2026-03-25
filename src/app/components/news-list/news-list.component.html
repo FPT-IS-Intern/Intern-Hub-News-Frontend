@@ -1,0 +1,38 @@
+<div class="news-list-container">
+  <!-- Featured Section (Top) -->
+  <section class="featured-section" *ngIf="featuredMain">
+    <div class="featured-left">
+      <article class="big-article" [routerLink]="['/', featuredMain.id]">
+        <div class="thumb-wrapper">
+          <img [src]="featuredMain.thumbNail" alt="main-thumb" />
+        </div>
+        <h2 class="featured-title">{{ featuredMain.title }}</h2>
+        <p class="featured-summary">{{ featuredMain.shortDescription }}</p>
+      </article>
+    </div>
+
+    <div class="featured-right">
+      <article *ngFor="let item of featuredMinors" class="minor-article" [routerLink]="['/', item.id]">
+        <h3 class="minor-title">{{ item.title }}</h3>
+        <div class="minor-thumb">
+          <img [src]="item.thumbNail" alt="minor-thumb" />
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Sub-category Section -->
+  <section class="subcategory-section">
+    <div *ngFor="let category of categories" class="category-column">
+      <div class="category-header">
+        <h2 class="category-name">{{ category.name }}</h2>
+      </div>
+      <div class="category-content">
+        <article *ngFor="let post of category.posts" class="category-article" [routerLink]="['/', post.id]">
+          <h4 class="article-title">{{ post.title }}</h4>
+          <!-- Optional thumbnail if needed for 1st article of category -->
+        </article>
+      </div>
+    </div>
+  </section>
+</div>

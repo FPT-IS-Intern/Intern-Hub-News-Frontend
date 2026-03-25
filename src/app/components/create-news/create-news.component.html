@@ -1,0 +1,307 @@
+<div class="create-news-page">
+  <!-- ── HEADER ── -->
+  <div class="page-header">
+    <div class="breadcrumb">
+      <app-icon class="breadcrumb-icon" icon="dsi-home-01-line"></app-icon>
+      <span class="breadcrumb-sep">/</span>
+      <button class="breadcrumb-link" type="button" (click)="goBack()">Tin tức</button>
+      <span class="breadcrumb-sep">/</span>
+      <button class="breadcrumb-link" type="button" (click)="goBack()">Quản lý tin tức</button>
+      <span class="breadcrumb-sep">/</span>
+      <span class="breadcrumb-current">{{ isEditMode ? 'Chỉnh sửa bài viết' : 'Tạo bài mới' }}</span>
+    </div>
+
+    <div class="header-row">
+      <div class="header-left">
+        <h1 class="page-title">{{ isEditMode ? 'Chỉnh sửa bài viết' : 'Tạo bài tin tức mới' }}</h1>
+      </div>
+      <div class="header-actions">
+        <app-button-container
+          content="Hủy bỏ"
+          size="md"
+          backgroundColor="transparent"
+          color="var(--brand-600)"
+          borderColor="var(--brand-200)"
+          borderRadius="8px"
+          (buttonClick)="goBack()"
+        ></app-button-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BODY ── -->
+  <div class="form-layout" [formGroup]="form">
+    <!-- LEFT COLUMN - TITLE, DESC, CONTENT -->
+    <div class="form-main">
+      <!-- TITLE & SHORT DESCRIPTION IN ONE ROW -->
+      <div class="card title-desc-card">
+        <div class="card-header">
+          <app-icon class="card-icon" icon="dsi-edit-02-line"></app-icon>
+          <span class="card-title">Thông tin cơ bản</span>
+        </div>
+        <div class="card-body">
+          <div class="title-desc-row">
+            <!-- TITLE -->
+            <div class="field-group flex-1">
+              <app-input-text
+                id="news-title"
+                headerInput="Tiêu đề bài viết"
+                placeholder="Nhập tiêu đề..."
+                [required]="true"
+                [maxLength]="150"
+                [showLimit]="true"
+                [value]="titleValue"
+                [errorMessage]="titleError"
+                borderColor="var(--brand-200)"
+                borderColorHover="var(--brand-600)"
+                borderRadius="8px"
+                width="100%"
+                (valueChange)="onTitleChange($event)"
+              ></app-input-text>
+            </div>
+            <!-- SHORT DESCRIPTION -->
+            <div class="field-group flex-1">
+              <app-input-text
+                id="news-short-description"
+                headerInput="Mô tả ngắn"
+                placeholder="Tóm tắt nội dung..."
+                [required]="true"
+                [maxLength]="255"
+                [showLimit]="true"
+                [value]="shortDescriptionValue"
+                [errorMessage]="shortDescriptionError"
+                borderColor="var(--brand-200)"
+                borderColorHover="var(--brand-600)"
+                borderRadius="8px"
+                width="100%"
+                (valueChange)="onShortDescriptionChange($event)"
+              ></app-input-text>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BODY / CONTENT -->
+      <div class="card">
+        <div class="card-header">
+          <app-icon class="card-icon" icon="dsi-file-02-line"></app-icon>
+          <span class="card-title">Nội dung bài viết</span>
+        </div>
+        <div class="card-body">
+          <div class="field-group">
+            <label class="field-label" for="news-body-quill">
+              Nội dung chi tiết <span class="required-star">*</span>
+            </label>
+            <quill-editor
+              id="news-body-quill"
+              formControlName="body"
+            ></quill-editor>
+            @if (bodyError) {
+              <span class="error-msg">{{ bodyError }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN (SIDEBAR) -->
+    <div class="form-sidebar">
+      <!-- STATUS & ACTIONS -->
+      <div class="card">
+        <div class="card-header">
+          <app-icon class="card-icon" icon="dsi-activity-line"></app-icon>
+          <span class="card-title">Trạng thái bài viết</span>
+        </div>
+        <div class="card-body">
+          <div class="status-display">
+            <span class="status-label">Hiện tại:</span>
+            <span class="status-value" [class.is-draft]="getStatusName() === 'Nháp'">
+              {{ getStatusName() }}
+            </span>
+          </div>
+
+          <div class="sidebar-actions-stacked">
+            @if (!isEditMode) {
+              <app-button-container
+                content="Lưu bản nháp"
+                size="md"
+                backgroundColor="transparent"
+                color="var(--brand-600)"
+                borderColor="var(--brand-300)"
+                borderRadius="8px"
+                width="100%"
+                (buttonClick)="submitWithStatus('DRAFT')"
+              ></app-button-container>
+            }
+
+            <app-button-container
+              [content]="isEditMode ? 'Cập nhật bài viết' : 'Đăng bài ngay'"
+              size="md"
+              backgroundColor="var(--brand-600)"
+              color="var(--neutral-color-10)"
+              borderRadius="8px"
+              width="100%"
+              (buttonClick)="submitWithStatus('PENDING')"
+            ></app-button-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURED TOGGLE -->
+      <div class="card">
+        <div class="card-body">
+          <div class="option-row featured-row no-border">
+            <div class="option-label">
+              <app-icon class="option-icon" icon="dsi-star-01-line"></app-icon>
+              <div>
+                <div class="option-name">Đánh dấu nổi bật</div>
+              </div>
+            </div>
+            <label class="switch-like">
+              <input
+                id="news-featured"
+                type="checkbox"
+                formControlName="featured"
+                title="Bài viết nổi bật"
+                aria-label="Bài viết nổi bật"
+              />
+              <span class="switch-ui"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- THUMBNAIL -->
+      <div class="card thumbnail-card">
+        <div class="card-header">
+          <app-icon class="card-icon" icon="dsi-image-01-line"></app-icon>
+          <span class="card-title">Ảnh bìa</span>
+          @if (thumbnailPreview) {
+            <app-button-container
+              content="Xóa"
+              leftIcon="dsi-trash-line"
+              size="xs"
+              backgroundColor="transparent"
+              color="var(--utility-600)"
+              border="none"
+              (buttonClick)="removeThumbnail()"
+            ></app-button-container>
+          }
+        </div>
+        <div class="card-body">
+          @if (!thumbnailPreview) {
+            <div
+              class="drop-zone"
+              [class.drag-over]="isDraggingOver"
+              role="button"
+              tabindex="0"
+              aria-label="Kéo ảnh vào đây hoặc click để chọn từ máy tính"
+              (click)="triggerFileInput()"
+              (keydown.enter)="triggerFileInput()"
+              (keydown.space)="triggerFileInput(); $event.preventDefault()"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+            >
+              <div class="drop-zone-inner">
+                <div class="drop-icon-wrapper">
+                  <app-icon class="drop-icon" icon="dsi-cloud-upload-line"></app-icon>
+                </div>
+                <p class="drop-text-main">Kéo ảnh vào đây</p>
+                <p class="drop-text-sub">hoặc <span class="browse-link">chọn từ máy tính</span></p>
+              </div>
+            </div>
+          } @else {
+            <div
+              class="thumbnail-preview-wrapper"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+            >
+              <img [src]="thumbnailPreview" alt="Thumbnail preview" class="thumbnail-preview" />
+              <div 
+                class="thumb-overlay" 
+                role="button"
+                tabindex="0"
+                aria-label="Thay đổi ảnh bìa"
+                (click)="triggerFileInput()"
+              >
+                <app-icon icon="dsi-refresh-01-line"></app-icon>
+                <span>Thay ảnh</span>
+              </div>
+            </div>
+          }
+          <input
+            id="thumbnail-input"
+            type="file"
+            accept="image/*"
+            class="hidden-input"
+            (change)="onFileInputChange($event)"
+          />
+        </div>
+      </div>
+
+      <!-- TOPICS -->
+      <div class="card">
+        <div class="card-header">
+          <app-icon class="card-icon" icon="dsi-tag-01-line"></app-icon>
+          <span class="card-title">Chủ đề</span>
+        </div>
+        <div class="card-body">
+          <!-- Topic -->
+          <div class="field-group">
+            <label class="field-label">Chủ đề <span class="label-hint">(không bắt buộc)</span></label>
+            <div class="dropdown-container" [class.is-open]="showTopicDropdown" (click)="toggleTopicDropdown($event)">
+              <div class="dropdown-trigger-overlay"></div>
+              <app-input-text
+                id="news-topic"
+                placeholder="Chọn chủ đề..."
+                [value]="selectedTopicNames"
+                icon="dsi-chevron-down-line"
+                [readonly]="true"
+                borderColor="var(--brand-200)"
+                borderColorHover="var(--brand-600)"
+                borderRadius="8px"
+                (iconClick)="toggleTopicDropdown()"
+                (click)="toggleTopicDropdown($event)"
+                (keydown.enter)="toggleTopicDropdown($event)"
+                (keydown.space)="toggleTopicDropdown($event); $event.preventDefault()"
+                tabindex="0"
+                role="button"
+                title="Chọn chủ đề"
+              ></app-input-text>
+
+              @if (showTopicDropdown) {
+                <div class="dropdown-panel">
+                  @for (topic of topics; track topic.id) {
+                    <div
+                      class="dropdown-item checkbox-item"
+                      [class.selected]="isTopicSelected(topic.id)"
+                      role="button"
+                      tabindex="0"
+                      (click)="selectTopic(topic); $event.stopPropagation()"
+                      (keydown.enter)="selectTopic(topic); $event.stopPropagation()"
+                      (keydown.space)="selectTopic(topic); $event.stopPropagation(); $event.preventDefault()"
+                    >
+                      <div class="custom-checkbox" [class.checked]="isTopicSelected(topic.id)">
+                        @if (isTopicSelected(topic.id)) {
+                          <app-icon icon="dsi-check-line"></app-icon>
+                        }
+                      </div>
+                      <span class="topic-label">{{ topic.name }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    @if (loadingMeta) {
+      <div class="loading-overlay">
+        <div class="loading-box">Đang tải dữ liệu...</div>
+      </div>
+    }
+  </div>
+</div>

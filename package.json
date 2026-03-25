@@ -1,0 +1,62 @@
+{
+  "name": "intern-hub-news-frontend",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "packageManager": "npm@11.7.0",
+  "dependencies": {
+    "@angular/animations": "21.1.0",
+    "@angular/common": "21.1.0",
+    "@angular/compiler": "21.1.0",
+    "@angular/core": "21.1.0",
+    "@angular/forms": "21.1.0",
+    "@angular/platform-browser": "21.1.0",
+    "@angular/platform-browser-dynamic": "21.1.0",
+    "@angular/router": "21.1.0",
+    "@goat-bravos/intern-hub-layout": "^4.0.6",
+    "@goat-bravos/shared-lib-client": "^1.0.1",
+    "@softarc/native-federation-node": "3.3.4",
+    "cron-parser": "^5.5.0",
+    "d3-drag": "^3.0.0",
+    "d3-selection": "^3.0.0",
+    "d3-shape": "^3.2.0",
+    "d3-zoom": "^3.0.0",
+    "dagre-compound": "^0.0.13",
+    "dynamic-ds": "~1.0.13",
+    "es-module-shims": "^1.5.12",
+    "ng-zorro-antd": "^21.1.0",
+    "ngx-quill": "^30.0.1",
+    "oxc-parser": "^0.110.0",
+    "quill": "^2.0.3",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular-architects/native-federation": "21.0.4",
+    "@angular-devkit/build-angular": "21.1.0",
+    "@angular/build": "21.1.0",
+    "@angular/cli": "21.1.0",
+    "@angular/compiler-cli": "21.1.0",
+    "jsdom": "27.1.0",
+    "typescript": "5.9.2",
+    "vitest": "4.0.8"
+  }
+}
