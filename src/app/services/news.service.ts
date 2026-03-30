@@ -32,7 +32,7 @@ export class NewsService {
     size: number = 10,
     startDate?: number,
     endDate?: number,
-    sortColumn: string = 'createdAt',
+    sortColumn: string = 'created_at',
     sortDirection: string = 'desc'
   ): Observable<ResponseApi<PaginatedData<NewsResponse>>> {
     let params = `page=${page}&size=${size}&sortColumn=${sortColumn}&sortDirection=${sortDirection}`;
@@ -45,29 +45,54 @@ export class NewsService {
 
   getAllFeatured(
     page: number = 0,
-    size: number = 10
+    size: number = 10,
+    sortColumn: string = 'created_at',
+    sortDirection: string = 'desc'
   ): Observable<ResponseApi<PaginatedData<NewsResponse>>> {
     return this.http.get<ResponseApi<PaginatedData<NewsResponse>>>(
-      `${this.baseUrl}/isFeatured?page=${page}&size=${size}`
+      `${this.baseUrl}/isFeatured?page=${page}&size=${size}&sortColumn=${sortColumn}&sortDirection=${sortDirection}`
     );
   }
 
   getApprovedNews(
     page: number = 0,
-    size: number = 10
+    size: number = 10,
+    sortColumn: string = 'created_at',
+    sortDirection: string = 'desc'
   ): Observable<ResponseApi<PaginatedData<NewsResponse>>> {
     return this.http.get<ResponseApi<PaginatedData<NewsResponse>>>(
-      `${this.baseUrl}/approved?page=${page}&size=${size}`
+      `${this.baseUrl}/approved?page=${page}&size=${size}&sortColumn=${sortColumn}&sortDirection=${sortDirection}`
+    );
+  }
+
+  searchByTitle(
+    title: string,
+    page: number = 0,
+    size: number = 10,
+    sortColumn: string = 'created_at',
+    sortDirection: string = 'desc'
+  ): Observable<ResponseApi<PaginatedData<NewsResponse>>> {
+    return this.http.post<ResponseApi<PaginatedData<NewsResponse>>>(
+      `${this.baseUrl}/search`,
+      {
+        title,
+        page,
+        size,
+        sortColumn,
+        sortDirection
+      }
     );
   }
 
   getApprovedNewsByTopic(
     topicId: string,
     page: number = 0,
-    size: number = 10
+    size: number = 10,
+    sortColumn: string = 'created_at',
+    sortDirection: string = 'desc'
   ): Observable<ResponseApi<PaginatedData<NewsResponse>>> {
     return this.http.get<ResponseApi<PaginatedData<NewsResponse>>>(
-      `${this.baseUrl}/by-topic/${topicId}?page=${page}&size=${size}`
+      `${this.baseUrl}/by-topic/${topicId}?page=${page}&size=${size}&sortColumn=${sortColumn}&sortDirection=${sortDirection}`
     );
   }
 

@@ -1,38 +1,92 @@
 <div class="news-list-container">
-  <!-- Featured Section (Top) -->
-  <section class="featured-section" *ngIf="featuredMain">
-    <div class="featured-left">
-      <article class="big-article" [routerLink]="['/', featuredMain.id]">
-        <div class="thumb-wrapper">
-          <img [src]="featuredMain.thumbNail" alt="main-thumb" />
+  <!-- Sort & Search Bar -->
+  <div class="sort-bar">
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        [formControl]="searchControl" 
+        placeholder="Tìm kiếm tin tức bài đăng..."
+        class="search-input"
+      />
+    </div>
+
+    <div class="sort-group">
+      <span class="sort-label">Sắp xếp:</span>
+      <div class="sort-options">
+        <button [class.active]="sortColumn === 'created_at'" (click)="onSortChange('created_at')">
+          Mới nhất
+          <span *ngIf="sortColumn === 'created_at'">{{ sortDirection === 'desc' ? '↓' : '↑' }}</span>
+        </button>
+        <button [class.active]="sortColumn === 'title'" (click)="onSortChange('title')">
+          Tiêu đề
+          <span *ngIf="sortColumn === 'title'">{{ sortDirection === 'desc' ? '↓' : '↑' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Results Section -->
+  <section class="search-results-section" *ngIf="isSearching">
+    <div class="results-header">
+      <h2>Kết quả tìm kiếm cho: "{{ searchControl.value }}"</h2>
+      <p class="results-count">Tìm thấy {{ searchResults.length }} bài viết</p>
+    </div>
+    
+    <div class="results-grid">
+      <article *ngFor="let item of searchResults" class="result-card" [routerLink]="['/news', item.id]">
+        <div class="result-thumb">
+          <img [src]="item.thumbNail" alt="thumb" />
         </div>
-        <h2 class="featured-title">{{ featuredMain.title }}</h2>
-        <p class="featured-summary">{{ featuredMain.shortDescription }}</p>
+        <div class="result-info">
+          <h3 class="result-title">{{ item.title }}</h3>
+          <p class="result-summary">{{ item.shortDescription }}</p>
+          <span class="result-date">{{ item.createdAt | date:'dd/MM/yyyy' }}</span>
+        </div>
       </article>
     </div>
 
-    <div class="featured-right">
-      <article *ngFor="let item of featuredMinors" class="minor-article" [routerLink]="['/', item.id]">
-        <h3 class="minor-title">{{ item.title }}</h3>
-        <div class="minor-thumb">
-          <img [src]="item.thumbNail" alt="minor-thumb" />
-        </div>
-      </article>
+    <div class="no-results" *ngIf="searchResults.length === 0">
+      <p>Không tìm thấy bài viết nào phù hợp với từ khóa của bạn.</p>
     </div>
   </section>
 
-  <!-- Sub-category Section -->
-  <section class="subcategory-section">
-    <div *ngFor="let category of categories" class="category-column">
-      <div class="category-header">
-        <h2 class="category-name">{{ category.name }}</h2>
-      </div>
-      <div class="category-content">
-        <article *ngFor="let post of category.posts" class="category-article" [routerLink]="['/', post.id]">
-          <h4 class="article-title">{{ post.title }}</h4>
-          <!-- Optional thumbnail if needed for 1st article of category -->
+  <!-- Normal Content (Hidden when searching) -->
+  <ng-container *ngIf="!isSearching">
+    <!-- Featured Section (Top) -->
+    <section class="featured-section" *ngIf="featuredMain">
+      <div class="featured-left">
+        <article class="big-article" [routerLink]="['/news', featuredMain.id]">
+          <div class="thumb-wrapper">
+            <img [src]="featuredMain.thumbNail" alt="main-thumb" />
+          </div>
+          <h2 class="featured-title">{{ featuredMain.title }}</h2>
+          <p class="featured-summary">{{ featuredMain.shortDescription }}</p>
         </article>
       </div>
-    </div>
-  </section>
+
+      <div class="featured-right">
+        <article *ngFor="let item of featuredMinors" class="minor-article" [routerLink]="['/news', item.id]">
+          <h3 class="minor-title">{{ item.title }}</h3>
+          <div class="minor-thumb">
+            <img [src]="item.thumbNail" alt="minor-thumb" />
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Sub-category Section -->
+    <section class="subcategory-section">
+      <div *ngFor="let category of categories" class="category-column">
+        <div class="category-header">
+          <h2 class="category-name">{{ category.name }}</h2>
+        </div>
+        <div class="category-content">
+          <article *ngFor="let post of category.posts" class="category-article" [routerLink]="['/news', post.id]">
+            <h4 class="article-title">{{ post.title }}</h4>
+          </article>
+        </div>
+      </div>
+    </section>
+  </ng-container>
 </div>

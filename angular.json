@@ -56,7 +56,7 @@
               "node_modules/quill/dist/quill.snow.css",
               "styles.scss"
             ],
-            "polyfills": ["es-module-shims"]
+            "polyfills": ["zone.js", "es-module-shims"]
           },
           "configurations": {
             "production": {

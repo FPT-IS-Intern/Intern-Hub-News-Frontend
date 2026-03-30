@@ -1,28 +1,35 @@
 <div class="dashboard-container">
-  <app-pop-up-confirm 
-    *ngIf="showConfirmDelete"
-    title="Xác nhận xóa"
-    content="Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác."
-    confirmText="Xác nhận xóa"
-    cancelText="Hủy bỏ"
-    (confirmClick)="confirmDelete()"
-    (cancelClick)="cancelDelete()">
-  </app-pop-up-confirm>
+  @if (showConfirmDelete) {
+    <app-pop-up-confirm 
+      title="Xác nhận xóa"
+      content="Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác."
+      confirmText="Xác nhận xóa"
+      cancelText="Hủy bỏ"
+      (confirmClick)="confirmDelete()"
+      (cancelClick)="cancelDelete()">
+    </app-pop-up-confirm>
+  }
 
   <div class="breadcrumb">
-    <app-icon class="breadcrumb-icon" icon="dsi-home-01-line"></app-icon>
+    <app-icon class="breadcrumb-icon clickable" icon="dsi-home-01-line" routerLink="/news"></app-icon>
     <span class="breadcrumb-sep">/</span>
-    <span class="breadcrumb-link">Tin tức</span>
+    <span class="breadcrumb-link" routerLink="/news">Tin tức</span>
     <span class="breadcrumb-sep">/</span>
     <span class="breadcrumb-current">Quản lý tin tức</span>
   </div>
 
   <div class="header-section">
     <h2 class="title">Tin tức</h2>
-    <a class="create-btn" [routerLink]="['/news/management/create-news']">
-      <app-icon icon="dsi-plus-line"></app-icon>
-      Tạo tin mới
-    </a>
+    <div class="header-actions">
+      <a class="secondary-btn" [routerLink]="['/news/management/topics']">
+        <app-icon icon="dsi-settings-02-line"></app-icon>
+        Quản lý chủ đề
+      </a>
+      <a class="create-btn" [routerLink]="['/news/management/create-news']">
+        <app-icon icon="dsi-plus-line"></app-icon>
+        Tạo tin mới
+      </a>
+    </div>
   </div>
 
   <div class="table-card">
@@ -64,39 +71,44 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let data of newsList; let i = index" class="clickable-row" [routerLink]="['/news/management', data.id]">
-            <td>{{ (pageIndex - 1) * pageSize + i + 1 }}</td>
-            <td class="col-title">{{ data.title }}</td>
-            <td class="col-desc">{{ data.shortDescription }}</td>
-            <td>
-              <span class="status-tag" [class.status-public]="data.status === 'APPROVE'"
-                [class.status-pending]="data.status === 'PENDING'"
-                [class.status-draft]="data.status === 'DRAFT'">
-                {{
-                data.status === 'APPROVE'
-                ? 'Đã duyệt'
-                : data.status === 'PENDING'
-                ? 'Chờ duyệt'
-                : 'Nháp'
-                }}
-              </span>
-            </td>
-            <td>{{ data.createdAt | date: 'dd/MM/yyyy' }}</td>
-            <td>Admin</td>
-            <td>
-              <div class="action-btns">
-                <button class="action-btn view-btn" title="Xem/Sửa">
-                  <app-icon icon="dsi-eye-line"></app-icon>
-                </button>
-                <button class="action-btn delete-btn" title="Xóa" (click)="deleteNews($event, data.id)">
-                  <app-icon icon="dsi-trash-01-line"></app-icon>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr *ngIf="!loading && newsList.length === 0">
-            <td colspan="7" class="empty-state">Không có dữ liệu</td>
-          </tr>
+          @for (data of newsList; track data.id; let i = $index) {
+            <tr class="clickable-row" [routerLink]="['/news/management', data.id]">
+              <td>{{ (pageIndex - 1) * pageSize + i + 1 }}</td>
+              <td class="col-title">{{ data.title }}</td>
+              <td class="col-desc">{{ data.shortDescription }}</td>
+              <td>
+                <span class="status-tag"  
+                  [class.status-public]="data.status === 'APPROVE' || data.status === 'Đã Duyệt' || data.status === 'QUYẾT ĐỊNH ĐĂNG'"
+                  [class.status-pending]="data.status === 'PENDING' || data.status === 'Chờ Duyệt' || data.status === 'CHỜ DUYỆT'"
+                  [class.status-reject]="data.status === 'REJECT' || data.status === 'Từ chối' || data.status === 'TỪ CHỐI' || data.status === 'BỊ TỪ CHỐI'"
+                  [class.status-draft]="data.status === 'DRAFT' || data.status === 'Nháp' || data.status === 'BẢN NHÁP' || data.status === 'Bản nháp'">
+                  {{
+                    (data.status === 'APPROVE' || data.status === 'Đã Duyệt' || data.status === 'QUYẾT ĐỊNH ĐĂNG') ? 'Đã duyệt' :
+                    (data.status === 'PENDING' || data.status === 'Chờ Duyệt' || data.status === 'CHỜ DUYỆT') ? 'Chờ duyệt' :
+                    (data.status === 'REJECT' || data.status === 'Từ chối' || data.status === 'TỪ CHỐI' || data.status === 'BỊ TỪ CHỐI') ? 'Từ chối' :
+                    'Nháp'
+                  }}
+                </span>
+              </td>
+              <td>{{ data.createdAt | date: 'dd/MM/yyyy' }}</td>
+              <td>Admin</td>
+              <td>
+                <div class="action-btns">
+                  <button class="action-btn view-btn" title="Xem/Sửa">
+                    <app-icon icon="dsi-eye-line"></app-icon>
+                  </button>
+                  <button class="action-btn delete-btn" title="Xóa" (click)="deleteNews($event, data.id)">
+                    <app-icon icon="dsi-trash-01-line"></app-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+          @if (!loading && newsList.length === 0) {
+            <tr>
+              <td colspan="7" class="empty-state">Không có dữ liệu</td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
@@ -124,11 +136,9 @@
     </div>
   </div>
 
-  <div *ngIf="loading" class="loading-overlay">
-    <div class="loading-box">Đang tải...</div>
-  </div>
-
-  <div *ngIf="loading" class="loading-overlay">
-    <div class="loading-box">Đang tải...</div>
-  </div>
+  @if (loading) {
+    <div class="loading-overlay">
+      <div class="loading-box">Đang tải...</div>
+    </div>
+  }
 </div>

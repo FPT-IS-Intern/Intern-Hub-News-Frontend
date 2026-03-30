@@ -1,6 +1,4 @@
 import { Routes } from '@angular/router';
-import { UserLayoutComponent } from './layouts/user-layout/user-layout.component';
-import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { PmPmoLayoutComponent } from './layouts/pm-pmo-layout/pm-pmo-layout.component';
 
 export const routes: Routes = [
@@ -11,11 +9,7 @@ export const routes: Routes = [
         path: '',
         loadComponent: () =>
           import('./components/news-list/news-list.component')
-            .then((m) => m.NewsListComponent)
-            .catch(() => {
-              class DummyComponent {}
-              return DummyComponent as any;
-            }),
+            .then((m) => m.NewsListComponent),
       },
       {
         path: 'management',
@@ -23,32 +17,33 @@ export const routes: Routes = [
           {
             path: 'dashboard',
             loadComponent: () =>
-              import('./components/admin-news-dashboard/admin-news-dashboard.component')
-                .then((m) => m.AdminNewsDashboardComponent)
-                .catch(() => {
-                  class DummyComponent {}
-                  return DummyComponent as any;
-                }),
+              import(
+                './components/admin-news-dashboard/admin-news-dashboard.component'
+              )
+                .then((m) => m.AdminNewsDashboardComponent),
+          },
+          {
+            path: 'topics',
+            loadComponent: () =>
+              import(
+                './components/news-topic-management/news-topic-management.component'
+              )
+                .then((m) => m.NewsTopicManagementComponent)
+                .catch(() => ({} as any)),
           },
           {
             path: 'create-news',
             loadComponent: () =>
               import('./components/create-news/create-news.component')
                 .then((m) => m.CreateNewsComponent)
-                .catch(() => {
-                  class DummyComponent {}
-                  return DummyComponent as any;
-                }),
+                .catch(() => ({} as any)),
           },
           {
             path: ':id',
             loadComponent: () =>
               import('./components/create-news/create-news.component')
                 .then((m) => m.CreateNewsComponent)
-                .catch(() => {
-                  class DummyComponent {}
-                  return DummyComponent as any;
-                }),
+                .catch(() => ({} as any)),
           },
           {
             path: '',
@@ -76,11 +71,7 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/pm-pmo-news-dashboard/pm-pmo-news-dashboard.component')
             .then((m) => m.PmPmoNewsDashboardComponent)
-            .catch(() => {
-              // Mock fallback
-              class DummyComponent {}
-              return DummyComponent as any;
-            }),
+            .catch(() => ({} as any)),
       },
     ],
   },

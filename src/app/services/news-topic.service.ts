@@ -16,4 +16,20 @@ export class NewsTopicService {
   getAll(): Observable<ResponseApi<NewsTopicResponse[]>> {
     return this.http.get<ResponseApi<NewsTopicResponse[]>>(this.baseUrl);
   }
+
+  getById(id: string): Observable<ResponseApi<NewsTopicResponse>> {
+    return this.http.get<ResponseApi<NewsTopicResponse>>(`${this.baseUrl}/${id}`);
+  }
+
+  create(topic: Partial<NewsTopicResponse>): Observable<ResponseApi<NewsTopicResponse>> {
+    return this.http.post<ResponseApi<NewsTopicResponse>>(this.baseUrl, topic);
+  }
+
+  update(id: string, topic: Partial<NewsTopicResponse>): Observable<ResponseApi<NewsTopicResponse>> {
+    return this.http.put<ResponseApi<NewsTopicResponse>>(`${this.baseUrl}/${id}`, topic);
+  }
+
+  delete(id: string): Observable<ResponseApi<string>> {
+    return this.http.delete<ResponseApi<string>>(`${this.baseUrl}/${id}`);
+  }
 }

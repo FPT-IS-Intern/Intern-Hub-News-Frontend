@@ -1,13 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NewsResponse } from '../../../models/news/news-response.model';
 import { NewsService } from '../../../services/news.service';
 
 @Component({
   selector: 'app-news-detail',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, RouterLink],
   templateUrl: './news-detail.component.html',
   styleUrls: ['./news-detail.component.scss']
 })

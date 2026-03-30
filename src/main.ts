@@ -1,4 +1,5 @@
 import { initFederation } from '@angular-architects/native-federation';
+import 'zone.js';
 
 initFederation()
   .catch((err) => console.error(err))

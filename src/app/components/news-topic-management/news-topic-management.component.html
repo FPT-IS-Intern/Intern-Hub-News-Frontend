@@ -1,0 +1,101 @@
+<div class="management-container">
+  @if (showConfirmDelete) {
+    <app-pop-up-confirm
+      title="Xác nhận xóa"
+      content="Bạn có chắc chắn muốn xóa chủ đề này không? Hành động này không thể hoàn tác."
+      confirmText="Xác nhận xóa"
+      cancelText="Hủy bỏ"
+      (confirmClick)="confirmDelete()"
+      (cancelClick)="cancelDelete()">
+    </app-pop-up-confirm>
+  }
+  <div class="breadcrumb">
+    <app-icon class="breadcrumb-icon clickable" icon="dsi-home-01-line" routerLink="/news"></app-icon>
+    <span class="breadcrumb-sep">/</span>
+    <span class="breadcrumb-link" routerLink="/news/management/dashboard">Tin tức</span>
+    <span class="breadcrumb-sep">/</span>
+    <span class="breadcrumb-current">Quản lý chủ đề</span>
+  </div>
+
+  <div class="header-section">
+    <div class="title-group">
+      <h2 class="title text-neutral-800">Quản lý chủ đề</h2>
+      <p class="subtitle text-neutral-500">Thêm, sửa hoặc xóa các chủ đề tin tức</p>
+    </div>
+    <button class="create-btn" (click)="openCreateModal()">
+      <app-icon icon="dsi-plus-line"></app-icon>
+      Thêm chủ đề mới
+    </button>
+  </div>
+
+  <div class="table-card">
+    <div class="table-scroll">
+      <table class="topic-table">
+        <thead>
+          <tr>
+            <th class="col-stt">STT</th>
+            <th class="col-name">Tên chủ đề</th>
+            <th class="col-desc">Mô tả</th>
+            <th class="col-action">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (topic of topics; track topic.id; let i = $index) {
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <td class="topic-name-cell">{{ topic.name }}</td>
+            <td class="topic-desc-cell">{{ topic.description || 'Chưa có mô tả' }}</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn edit-btn" title="Chỉnh sửa" (click)="openEditModal(topic)">
+                  <app-icon icon="dsi-edit-02-line"></app-icon>
+                </button>
+                <button class="action-btn delete-btn" title="Xóa" (click)="deleteTopic(topic.id)">
+                  <app-icon icon="dsi-trash-01-line"></app-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }
+          @if (!loading && topics.length === 0) {
+          <tr>
+            <td colspan="4" class="empty-state">Không có chủ đề nào</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  @if (loading) {
+  <div class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <span>Đang tải...</span>
+  </div>
+  }
+
+  <!-- Modal -->
+  @if (showModal) {
+    <div class="modal-backdrop" (click)="closeModal()" tabindex="-1" (keydown.enter)="closeModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ isEdit ? 'Chỉnh sửa chủ đề' : 'Thêm chủ đề mới' }}</h3>
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="topicName">Tên chủ đề</label>
+          <input id="topicName" type="text" [(ngModel)]="editingTopic.name" placeholder="Nhập tên chủ đề..." class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="topicDesc">Mô tả</label>
+          <textarea id="topicDesc" [(ngModel)]="editingTopic.description" placeholder="Nhập mô tả..." class="form-control" rows="4"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Hủy bỏ</button>
+        <button class="btn btn-primary" (click)="saveTopic()">Lưu lại</button>
+      </div>
+    </div>
+  }
+</div>

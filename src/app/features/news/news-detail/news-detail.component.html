@@ -1,21 +1,47 @@
 @if (news) {
-  <div class="news-detail-wrapper">
-    <div class="news-header-meta">
-      <div class="meta-pill">
-        Admin, {{ createdAtDate | date: 'dd/MM/yyyy , HH:mm:ss' }}
+  <div class="news-detail-container">
+    <a routerLink="/news" class="back-btn">
+      <i class="pi pi-arrow-left"></i>
+      Quay lại trang chủ
+    </a>
+
+    <header class="news-hero shadow-lg">
+      @if (news.thumbNail) {
+        <img [src]="news.thumbNail" [alt]="news.title" [title]="news.title" class="news-thumbnail" />
+      } @else {
+        <div class="news-thumbnail bg-brand-soft flex align-items-center justify-content-center">
+          <i class="pi pi-image text-brand-strong placeholder-icon"></i>
+        </div>
+      }
+      <div class="hero-overlay">
+        <div class="news-meta-header">
+          @for (topic of news.topics; track topic.id) {
+            <span class="topic-pill">{{ topic.name }}</span>
+          }
+        </div>
       </div>
-    </div>
-    
-    <h1 class="news-title color-text-neutral-strong">{{ news.title }}</h1>
-    
-    @if (news.thumbNail) {
-      <div class="news-thumbnail-wrapper">
-        <img [src]="news.thumbNail" alt="Thumbnail" class="news-thumbnail w-100 rounded-md" />
+    </header>
+
+    <article class="glass-card">
+      <div class="news-meta-info mb-4">
+        <span class="date-pill">
+          Đăng ngày: {{ createdAtDate | date: 'dd/MM/yyyy' }} bởi <strong>Admin</strong>
+        </span>
       </div>
-    }
-    
-    <div class="news-content-body color-text-neutral-sub">
-      {{ news.body }}
-    </div>
+
+      <h1 class="news-title">{{ news.title }}</h1>
+      
+      @if (news.shortDescription) {
+        <p class="news-description">{{ news.shortDescription }}</p>
+      }
+
+      <div class="news-content-body">
+        {{ news.body }}
+      </div>
+    </article>
+  </div>
+} @else {
+  <div class="flex justify-content-center align-items-center p-8">
+    <div class="text-neutral-500 font-medium">Đang tải tin tức...</div>
   </div>
 }
