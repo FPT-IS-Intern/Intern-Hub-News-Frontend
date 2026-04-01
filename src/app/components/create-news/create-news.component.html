@@ -190,11 +190,10 @@
         </div>
         <div class="card-body">
           @if (!thumbnailPreview) {
-            <div
+            <button
+              type="button"
               class="drop-zone"
               [class.drag-over]="isDraggingOver"
-              role="button"
-              tabindex="0"
               aria-label="Kéo ảnh vào đây hoặc click để chọn từ máy tính"
               (click)="triggerFileInput()"
               (keydown.enter)="triggerFileInput()"
@@ -210,7 +209,7 @@
                 <p class="drop-text-main">Kéo ảnh vào đây</p>
                 <p class="drop-text-sub">hoặc <span class="browse-link">chọn từ máy tính</span></p>
               </div>
-            </div>
+            </button>
           } @else {
             <div
               class="thumbnail-preview-wrapper"
@@ -219,16 +218,17 @@
               (drop)="onDrop($event)"
             >
               <img [src]="thumbnailPreview" alt="Thumbnail preview" class="thumbnail-preview" />
-              <div 
-                class="thumb-overlay" 
-                role="button"
-                tabindex="0"
+              <button
+                type="button"
+                class="thumb-overlay"
                 aria-label="Thay đổi ảnh bìa"
                 (click)="triggerFileInput()"
+                (keydown.enter)="triggerFileInput()"
+                (keydown.space)="triggerFileInput(); $event.preventDefault()"
               >
                 <app-icon icon="dsi-refresh-01-line"></app-icon>
                 <span>Thay ảnh</span>
-              </div>
+              </button>
             </div>
           }
           <input
@@ -252,7 +252,11 @@
           <div class="field-group">
             <label class="field-label">Chủ đề <span class="label-hint">(không bắt buộc)</span></label>
             <div class="dropdown-container" [class.is-open]="showTopicDropdown" (click)="toggleTopicDropdown($event)">
-              <div class="dropdown-trigger-overlay"></div>
+              <button
+                type="button"
+                class="dropdown-trigger-overlay"
+                aria-label="Mở danh sách chọn chủ đề"
+              ></button>
               <app-input-text
                 id="news-topic"
                 placeholder="Chọn chủ đề..."
@@ -266,19 +270,16 @@
                 (click)="toggleTopicDropdown($event)"
                 (keydown.enter)="toggleTopicDropdown($event)"
                 (keydown.space)="toggleTopicDropdown($event); $event.preventDefault()"
-                tabindex="0"
-                role="button"
                 title="Chọn chủ đề"
               ></app-input-text>
 
               @if (showTopicDropdown) {
                 <div class="dropdown-panel">
                   @for (topic of topics; track topic.id) {
-                    <div
+                    <button
+                      type="button"
                       class="dropdown-item checkbox-item"
                       [class.selected]="isTopicSelected(topic.id)"
-                      role="button"
-                      tabindex="0"
                       (click)="selectTopic(topic); $event.stopPropagation()"
                       (keydown.enter)="selectTopic(topic); $event.stopPropagation()"
                       (keydown.space)="selectTopic(topic); $event.stopPropagation(); $event.preventDefault()"
@@ -289,7 +290,7 @@
                         }
                       </div>
                       <span class="topic-label">{{ topic.name }}</span>
-                    </div>
+                    </button>
                   }
                 </div>
               }

@@ -36,7 +36,7 @@
     <div class="results-grid">
       <article *ngFor="let item of searchResults" class="result-card" [routerLink]="['/news', item.id]">
         <div class="result-thumb">
-          <img [src]="item.thumbNail" alt="thumb" />
+          <img [src]="item.thumbNail | fileUrl" alt="thumb" />
         </div>
         <div class="result-info">
           <h3 class="result-title">{{ item.title }}</h3>
@@ -58,7 +58,7 @@
       <div class="featured-left">
         <article class="big-article" [routerLink]="['/news', featuredMain.id]">
           <div class="thumb-wrapper">
-            <img [src]="featuredMain.thumbNail" alt="main-thumb" />
+            <img [src]="featuredMain.thumbNail | fileUrl" alt="main-thumb" />
           </div>
           <h2 class="featured-title">{{ featuredMain.title }}</h2>
           <p class="featured-summary">{{ featuredMain.shortDescription }}</p>
@@ -69,7 +69,7 @@
         <article *ngFor="let item of featuredMinors" class="minor-article" [routerLink]="['/news', item.id]">
           <h3 class="minor-title">{{ item.title }}</h3>
           <div class="minor-thumb">
-            <img [src]="item.thumbNail" alt="minor-thumb" />
+            <img [src]="item.thumbNail | fileUrl" alt="minor-thumb" />
           </div>
         </article>
       </div>

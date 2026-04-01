@@ -22,11 +22,18 @@ import {
   InputTextComponent,
 } from '@goat-bravos/intern-hub-layout';
 
+import { forkJoin, of, switchMap, catchError } from 'rxjs';
+import { DmsService } from '../../services/dms.service';
+import { ImageUtils } from '../../utils/image.utils';
+import {
+  CreateNewsRequest,
+  UpdateNewsRequest,
+  NewsTopicResponse,
+  NewsStatusResponse,
+} from '../../models/news';
 import { NewsService } from '../../services/news.service';
 import { NewsTopicService } from '../../services/news-topic.service';
 import { NewsStatusService } from '../../services/news-status.service';
-import { NewsTopicResponse, NewsStatusResponse, CreateNewsRequest } from '../../models/news';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-create-news',
@@ -52,7 +59,8 @@ export class CreateNewsComponent implements OnInit {
 
   // Thumbnail drag & drop state
   thumbnailPreview: string | null = null;
-  thumbnailBase64: string | null = null;
+  selectedFile: File | null = null;
+  currentThumbnailKey: string | null = null;
   isDraggingOver = false;
 
   // Custom Dropdown State
@@ -72,6 +80,7 @@ export class CreateNewsComponent implements OnInit {
     private readonly newsService: NewsService,
     private readonly topicService: NewsTopicService,
     private readonly statusService: NewsStatusService,
+    private readonly dmsService: DmsService,
     private readonly cdr: ChangeDetectorRef,
     private readonly el: ElementRef
   ) {}
@@ -118,8 +127,8 @@ export class CreateNewsComponent implements OnInit {
           this.titleValue = news.title;
           this.shortDescriptionValue = news.shortDescription;
           this.bodyValue = news.body;
-          this.thumbnailPreview = news.thumbNail || null;
-          this.thumbnailBase64 = news.thumbNail || null;
+          this.currentThumbnailKey = news.thumbNail || null;
+          this.thumbnailPreview = ImageUtils.getFileUrl(news.thumbNail);
           this.cdr.markForCheck();
         }
       },
@@ -291,11 +300,11 @@ export class CreateNewsComponent implements OnInit {
       globalThis.alert('Kích thước ảnh không được vượt quá 5MB.');
       return;
     }
+    this.selectedFile = file;
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = e.target?.result as string;
       this.thumbnailPreview = result;
-      this.thumbnailBase64 = result;
       this.cdr.markForCheck();
     };
     reader.readAsDataURL(file);
@@ -303,7 +312,7 @@ export class CreateNewsComponent implements OnInit {
 
   removeThumbnail(): void {
     this.thumbnailPreview = null;
-    this.thumbnailBase64 = null;
+    this.selectedFile = null;
   }
 
   triggerFileInput(): void {
@@ -350,21 +359,59 @@ export class CreateNewsComponent implements OnInit {
     this.submitting = true;
     const values = this.form.value;
 
-    const request: CreateNewsRequest = {
+    const requestBody: CreateNewsRequest | UpdateNewsRequest = {
       title: values.title,
       shortDescription: values.shortDescription,
       body: values.body,
-      thumbnail: this.thumbnailBase64 ?? undefined,
-      topicIds: values.topicIds && values.topicIds.length > 0 ? values.topicIds : undefined,
+      topicIds: values.topicIds && values.topicIds.length > 0 ? values.topicIds : (this.isEditMode ? [] : undefined),
       statusId: values.statusId,
       featured: values.featured,
-    };
+      thumbnail: this.currentThumbnailKey ?? undefined,
+    } as any;
 
-    const obs = this.isEditMode
-      ? this.newsService.update(this.newsId!, request as any)
-      : this.newsService.create(request);
+    let uploadObs = of<string | null>(null);
 
-    obs.subscribe({
+    // Chỉ thực hiện xử lý ảnh nếu có sự thay đổi (chọn file mới hoặc xóa file cũ)
+    const hasNewFile = !!this.selectedFile;
+    const isFileRemoved = !this.thumbnailPreview && !!this.currentThumbnailKey;
+
+    if (hasNewFile) {
+      // TRƯỜNG HỢP 1: Chọn file mới -> Upload lên DMS
+      let deleteObs = of<any>(null);
+      // Nếu đang sửa và có ảnh cũ, xóa ảnh cũ trước khi upload mới
+      if (this.isEditMode && this.currentThumbnailKey) {
+        deleteObs = this.dmsService.delete(this.currentThumbnailKey).pipe(
+          catchError(() => of(null))
+        );
+      }
+
+      uploadObs = deleteObs.pipe(
+        switchMap(() => this.dmsService.upload(this.selectedFile!)),
+        switchMap((res) => of(res.data.objectKey))
+      );
+    } 
+    else if (isFileRemoved && this.isEditMode) {
+      // TRƯỜNG HỢP 2: Người dùng xóa ảnh cũ -> Chỉ gọi Delete DMS
+      uploadObs = this.dmsService.delete(this.currentThumbnailKey!).pipe(
+        switchMap(() => of('')), // Trả về chuỗi rỗng để backend xóa field thumbnail
+        catchError(() => of(''))
+      );
+    }
+    // Nếu không thuộc 2 trường hợp trên (không thay đổi), uploadObs = of(null) -> Giữ nguyên thumbnail cũ
+
+    uploadObs.pipe(
+      switchMap((objectKey) => {
+        if (objectKey !== null) {
+          requestBody.thumbnail = objectKey;
+        }
+
+        if (this.isEditMode) {
+          return this.newsService.update(this.newsId!, requestBody as UpdateNewsRequest);
+        } else {
+          return this.newsService.create(requestBody as CreateNewsRequest);
+        }
+      })
+    ).subscribe({
       next: () => {
         this.submitting = false;
         globalThis.alert(
@@ -372,13 +419,11 @@ export class CreateNewsComponent implements OnInit {
         );
         this.router.navigate(['/news/management/dashboard']);
       },
-      error: () => {
+      error: (err) => {
         this.submitting = false;
-        globalThis.alert(
-          this.isEditMode
-            ? 'Cập nhật tin tức thất bại. Vui lòng thử lại.'
-            : 'Tạo bài tin tức thất bại. Vui lòng thử lại.'
-        );
+        console.error('Submit error:', err);
+        const errorMsg = err?.error?.status?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
+        globalThis.alert(errorMsg);
       },
     });
   }

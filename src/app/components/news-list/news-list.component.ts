@@ -6,11 +6,12 @@ import { forkJoin, map, switchMap, of, debounceTime, distinctUntilChanged } from
 import { NewsService } from '../../services/news.service';
 import { NewsTopicService } from '../../services/news-topic.service';
 import { NewsResponse } from '../../models/news';
+import { FileUrlPipe } from '../../utils/file-url.pipe';
 
 @Component({
   selector: 'app-news-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, RouterLink, ReactiveFormsModule, FileUrlPipe],
   templateUrl: './news-list.component.html',
   styleUrl: './news-list.component.scss',
 })

@@ -3,11 +3,12 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NewsResponse } from '../../../models/news/news-response.model';
 import { NewsService } from '../../../services/news.service';
+import { FileUrlPipe } from '../../../utils/file-url.pipe';
 
 @Component({
   selector: 'app-news-detail',
   standalone: true,
-  imports: [CommonModule, DatePipe, RouterLink],
+  imports: [CommonModule, DatePipe, RouterLink, FileUrlPipe],
   templateUrl: './news-detail.component.html',
   styleUrls: ['./news-detail.component.scss']
 })

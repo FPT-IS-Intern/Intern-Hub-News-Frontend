@@ -7,7 +7,7 @@
 
     <header class="news-hero shadow-lg">
       @if (news.thumbNail) {
-        <img [src]="news.thumbNail" [alt]="news.title" [title]="news.title" class="news-thumbnail" />
+        <img [src]="news.thumbNail | fileUrl" [alt]="news.title" [title]="news.title" class="news-thumbnail" />
       } @else {
         <div class="news-thumbnail bg-brand-soft flex align-items-center justify-content-center">
           <i class="pi pi-image text-brand-strong placeholder-icon"></i>
