@@ -261,7 +261,7 @@
                 id="news-topic"
                 placeholder="Chọn chủ đề..."
                 [value]="selectedTopicNames"
-                icon="dsi-chevron-down-line"
+                [icon]="showTopicDropdown ? 'dsi-chevron-up-line' : 'dsi-chevron-down-line'"
                 [readonly]="true"
                 borderColor="var(--brand-200)"
                 borderColorHover="var(--brand-600)"
