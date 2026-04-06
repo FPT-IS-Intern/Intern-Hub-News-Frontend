@@ -174,12 +174,12 @@ export class CreateNewsComponent implements OnInit {
       },
       error: () => {
         this.loadingMeta = false;
-        globalThis.alert('KhÃ´ng thá»ƒ táº£i danh sÃ¡ch chá»§ Ä‘á» / tráº¡ng thÃ¡i.');
+        globalThis.alert('Không thể tải danh sách chủ đề / trạng thái.');
       },
     });
   }
 
-  // â”€â”€â”€ TITLE / BODY binding â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // TITLE / BODY binding
 
   onTitleChange(val: string): void {
     this.titleValue = val;
@@ -195,25 +195,25 @@ export class CreateNewsComponent implements OnInit {
 
   get titleError(): string {
     const ctrl = this.form.get('title');
-    if (ctrl?.dirty && ctrl.hasError('required')) return 'TiÃªu Ä‘á» khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng';
-    if (ctrl?.dirty && ctrl.hasError('maxlength')) return 'TiÃªu Ä‘á» tá»‘i Ä‘a 150 kÃ½ tá»±';
+    if (ctrl?.dirty && ctrl.hasError('required')) return 'Tiêu đề không được để trống';
+    if (ctrl?.dirty && ctrl.hasError('maxlength')) return 'Tiêu đề tối đa 150 ký tự';
     return '';
   }
 
   get shortDescriptionError(): string {
     const ctrl = this.form.get('shortDescription');
-    if (ctrl?.dirty && ctrl.hasError('required')) return 'MÃ´ táº£ ngáº¯n khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng';
-    if (ctrl?.dirty && ctrl.hasError('maxlength')) return 'MÃ´ táº£ ngáº¯n tá»‘i Ä‘a 255 kÃ½ tá»±';
+    if (ctrl?.dirty && ctrl.hasError('required')) return 'Mô tả ngắn không được để trống';
+    if (ctrl?.dirty && ctrl.hasError('maxlength')) return 'Mô tả ngắn tối đa 255 ký tự';
     return '';
   }
 
   get bodyError(): string {
     const ctrl = this.form.get('body');
-    if (ctrl?.dirty && ctrl.hasError('required')) return 'Ná»™i dung khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng';
+    if (ctrl?.dirty && ctrl.hasError('required')) return 'Nội dung không được để trống';
     return '';
   }
 
-  // â”€â”€â”€ CUSTOM DROPDOWNS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // CUSTOM DROPDOWNS
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event): void {
@@ -224,14 +224,14 @@ export class CreateNewsComponent implements OnInit {
 
   getStatusName(): string {
     const statusId = this.form.get('statusId')?.value;
-    if (!statusId) return this.isEditMode ? 'Chá» duyá»‡t' : 'NhÃ¡p';
+    if (!statusId) return this.isEditMode ? 'Chờ duyệt' : 'Nháp';
     const status = this.statuses.find((s) => s.id === statusId);
-    if (!status) return 'NhÃ¡p';
+    if (!status) return 'Nháp';
     const name = status.name?.toUpperCase();
-    if (name === 'APPROVE' || name === 'QUYáº¾T Äá»ŠNH ÄÄ‚NG') return 'ÄÃ£ duyá»‡t';
+    if (name === 'APPROVE' || name === 'QUYẾT ĐỊNH ĐĂNG') return 'Đã duyệt';
     if (name === 'PENDING' || name === 'CHá»œ DUYá»†T') return 'Chá» duyá»‡t';
-    if (name === 'DRAFT' || name === 'Báº¢N NHÃP') return 'NhÃ¡p';
-    return status.name || 'NhÃ¡p';
+    if (name === 'DRAFT' || name === 'BẢN NHÁP') return 'Nháp';
+    return status.name || 'Nháp';
   }
 
   get selectedTopicNames(): string {
@@ -272,7 +272,7 @@ export class CreateNewsComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  // â”€â”€â”€ THUMBNAIL UPLOAD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // THUMBNAIL UPLOAD
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -307,11 +307,11 @@ export class CreateNewsComponent implements OnInit {
 
   private processImageFile(file: File): void {
     if (!file.type.startsWith('image/')) {
-      globalThis.alert('Vui lÃ²ng chá»n file hÃ¬nh áº£nh.');
+      globalThis.alert('Vui lòng chọn file hình ảnh.');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      globalThis.alert('KÃ­ch thÆ°á»›c áº£nh khÃ´ng Ä‘Æ°á»£c vÆ°á»£t quÃ¡ 5MB.');
+      globalThis.alert('Kích thước ảnh không được vượt quá 5MB.');
       return;
     }
     this.selectedFile = file;
@@ -334,23 +334,23 @@ export class CreateNewsComponent implements OnInit {
     input?.click();
   }
 
-  // â”€â”€â”€ ACTIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ACTIONS
 
   submitWithStatus(statusName: string): void {
     this.intendedSubmitStatus = statusName.toUpperCase() === 'PENDING' ? 'PENDING' : 'DRAFT';
     const status = this.statuses.find((s) => {
       const name = s.name.toUpperCase();
       if (statusName.toUpperCase() === 'PENDING') {
-        return name === 'PENDING' || name === 'CHá»œ DUYá»†T' || name === 'QUYáº¾T Äá»ŠNH ÄÄ‚NG';
+        return name === 'PENDING' || name === 'CHỜ DUYỆT' || name === 'QUYẾT ĐỊNH ĐĂNG';
       }
       if (statusName.toUpperCase() === 'DRAFT') {
-        return name === 'DRAFT' || name === 'Báº¢N NHÃP' || name === 'NHÃP';
+        return name === 'DRAFT' || name === 'BẢN NHÁP' || name === 'NHÁP';
       }
       return name === statusName.toUpperCase();
     });
 
     if (!status) {
-      globalThis.alert(`KhÃ´ng tÃ¬m tháº¥y cáº¥u hÃ¬nh tráº¡ng thÃ¡i: ${statusName}`);
+      globalThis.alert(`Không tìm thấy cấu hình trạng thái: ${statusName}`);
       return;
     }
 
@@ -358,7 +358,7 @@ export class CreateNewsComponent implements OnInit {
     this.submit();
   }
 
-  // â”€â”€â”€ SUBMIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // SUBMIT
 
   submit(): void {
     if (this.submitting) return;
@@ -393,7 +393,7 @@ export class CreateNewsComponent implements OnInit {
 
     let uploadObs = of<string | null>(null);
 
-    // Chá»‰ thá»±c hiá»‡n xá»­ lÃ½ áº£nh náº¿u cÃ³ sá»± thay Ä‘á»•i (chá»n file má»›i hoáº·c xÃ³a file cÅ©)
+    // Chỉ thực hiện xử lý ảnh nếu có sự thay đổi (chọn file mới hoặc xóa file cũ)
     const hasNewFile = !!this.selectedFile;
     const isFileRemoved = !this.thumbnailPreview && !!this.currentThumbnailKey;
 
@@ -418,7 +418,7 @@ export class CreateNewsComponent implements OnInit {
       const oldObjectKey = this.extractObjectKey(this.currentThumbnailKey);
       if (oldObjectKey) {
         uploadObs = this.dmsService.delete(oldObjectKey).pipe(
-          switchMap(() => of('')), // Tráº£ vá» chuá»—i rá»—ng Ä‘á»ƒ backend xÃ³a field thumbnail
+          switchMap(() => of('')), // Trả về chuỗi rỗng để backend xóa field thumbnail
           catchError(() => of('')),
         );
       } else {
@@ -459,7 +459,7 @@ export class CreateNewsComponent implements OnInit {
         error: (err) => {
           this.submitting = false;
           console.error('Submit error:', err);
-          const errorMsg = err?.error?.status?.message || 'CÃ³ lá»—i xáº£y ra. Vui lÃ²ng thá»­ láº¡i.';
+          const errorMsg = err?.error?.status?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
           globalThis.alert(errorMsg);
         },
       });
