@@ -329,16 +329,22 @@
 </div>
 
 @if (showApprovalNoticePopup) {
-  <div class="approval-popup-overlay" (click)="closeApprovalNoticePopup()">
-    <div class="approval-popup-container" (click)="$event.stopPropagation()">
-      <div class="approval-popup-title">Th&ocirc;ng b&aacute;o</div>
-      <div class="approval-popup-message">
-        B&agrave;i &#273;&#259;ng s&#7869; &#273;&#432;&#7907;c &#273;&#259;ng khi &#273;&#432;&#7907;c
-        ph&ecirc; duy&#7879;t.
+  <div class="popup-overlay" (click)="closeApprovalNoticePopup()">
+    <div class="popup-container" (click)="$event.stopPropagation()">
+      <div class="popup-icon">
+        <img src="app/shared/assest/pending.svg" alt="pending" />
       </div>
-      <div class="approval-popup-actions">
-        <button type="button" class="approval-popup-btn" (click)="closeApprovalNoticePopup()">
-          &#272;&atilde; hi&#7875;u
+      <div class="popup-title">&#272;ang ch&#7901; ph&ecirc; duy&#7879;t</div>
+      <div class="popup-subtitle">
+        B&agrave;i &#273;&#259;ng s&#7869; &#273;&#432;&#7907;c &#273;&#259;ng khi &#273;&#432;&#7907;c ph&ecirc;
+        duy&#7879;t.
+      </div>
+      <div class="popup-actions">
+        <button type="button" class="popup-btn btn-exit" (click)="closeApprovalNoticePopup()">
+          Tho&aacute;t
+        </button>
+        <button type="button" class="popup-btn btn-confirm" (click)="confirmApprovalNoticePopup()">
+          Qu&#7843;n l&yacute; tin t&#7913;c
         </button>
       </div>
     </div>

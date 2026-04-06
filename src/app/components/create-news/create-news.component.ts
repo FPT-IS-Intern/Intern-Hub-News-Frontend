@@ -467,6 +467,10 @@ export class CreateNewsComponent implements OnInit {
 
   closeApprovalNoticePopup(): void {
     this.showApprovalNoticePopup = false;
+  }
+
+  confirmApprovalNoticePopup(): void {
+    this.showApprovalNoticePopup = false;
     this.router.navigate(['/news/management/dashboard']);
   }
   private buildThumbnailUrl(objectKey: string): string {
