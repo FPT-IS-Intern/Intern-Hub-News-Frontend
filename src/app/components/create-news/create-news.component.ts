@@ -73,6 +73,7 @@ export class CreateNewsComponent implements OnInit {
   approvalPopupTitle = 'Đang chờ phê duyệt';
   approvalPopupSubtitle = 'Bài đăng sẽ được đăng khi được phê duyệt.';
   approvalPopupConfirmText = 'Phiếu của tôi';
+  submitErrorMessage = '';
   private approvalPopupNavigateUrl = '/ticket/my-ticket';
   private canApproveLevel2 = false;
   private intendedSubmitStatus: 'PENDING' | 'DRAFT' | 'APPROVED' | null = null;
@@ -344,6 +345,7 @@ export class CreateNewsComponent implements OnInit {
     if (this.loadingMeta) {
       return;
     }
+    this.submitErrorMessage = '';
 
     const normalizedAction = statusName.toUpperCase();
 
@@ -378,6 +380,7 @@ export class CreateNewsComponent implements OnInit {
 
   submit(): void {
     if (this.submitting) return;
+    this.submitErrorMessage = '';
 
     // Mark all controls dirty to trigger validation display
     Object.values(this.form.controls).forEach((ctrl) => {
@@ -487,10 +490,24 @@ export class CreateNewsComponent implements OnInit {
         error: (err) => {
           this.submitting = false;
           console.error('Submit error:', err);
-          const errorMsg = err?.error?.status?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
-          globalThis.alert(errorMsg);
+          this.submitErrorMessage = this.mapSubmitErrorMessage(err);
         },
       });
+  }
+
+  private mapSubmitErrorMessage(err: any): string {
+    const rawMessage = (err?.error?.status?.message || '').toString();
+    const normalizedMessage = rawMessage.toUpperCase();
+
+    if (normalizedMessage.includes('STATUS NOT FOUND: PENDING')) {
+      return 'Hệ thống chưa cấu hình trạng thái Chờ duyệt. Vui lòng liên hệ quản trị viên.';
+    }
+
+    if (normalizedMessage.includes('STATUS NOT FOUND: APPROVED')) {
+      return 'Hệ thống chưa cấu hình trạng thái Đã duyệt. Vui lòng liên hệ quản trị viên.';
+    }
+
+    return rawMessage || 'Có lỗi xảy ra. Vui lòng thử lại.';
   }
 
   closeApprovalNoticePopup(): void {

@@ -156,6 +156,10 @@
                 <span>{{ isEditMode ? 'Đang cập nhật...' : 'Đang tạo bài...' }}</span>
               </button>
             }
+
+            @if (submitErrorMessage) {
+              <div class="submit-error-message">{{ submitErrorMessage }}</div>
+            }
           </div>
         </div>
       </div>
