@@ -71,7 +71,7 @@ export class CreateNewsComponent implements OnInit {
   bodyValue = '';
   showApprovalNoticePopup = false;
   private canApproveLevel2 = false;
-  private intendedSubmitStatus: 'PENDING' | 'DRAFT' | null = null;
+  private intendedSubmitStatus: 'PENDING' | 'DRAFT' | 'APPROVED' | null = null;
 
   private readonly s3DomainUrl = getS3DomainUrl();
 
@@ -227,10 +227,10 @@ export class CreateNewsComponent implements OnInit {
     if (!statusId) return this.isEditMode ? 'Chờ duyệt' : 'Nháp';
     const status = this.statuses.find((s) => s.id === statusId);
     if (!status) return 'Nháp';
-    const name = status.name?.toUpperCase();
-    if (name === 'APPROVE' || name === 'QUYẾT ĐỊNH ĐĂNG') return 'Đã duyệt';
-    if (name === 'PENDING' || name === 'CHá»œ DUYá»†T') return 'Chá» duyá»‡t';
-    if (name === 'DRAFT' || name === 'BẢN NHÁP') return 'Nháp';
+    const name = this.normalizeStatusName(status.name);
+    if (name === 'APPROVE' || name === 'QUYET DINH DANG') return 'Đã duyệt';
+    if (name === 'PENDING' || name === 'CHO DUYET') return 'Chờ duyệt';
+    if (name === 'DRAFT' || name === 'BAN NHAP' || name === 'NHAP') return 'Nháp';
     return status.name || 'Nháp';
   }
 
@@ -337,17 +337,15 @@ export class CreateNewsComponent implements OnInit {
   // ACTIONS
 
   submitWithStatus(statusName: string): void {
-    this.intendedSubmitStatus = statusName.toUpperCase() === 'PENDING' ? 'PENDING' : 'DRAFT';
-    const status = this.statuses.find((s) => {
-      const name = s.name.toUpperCase();
-      if (statusName.toUpperCase() === 'PENDING') {
-        return name === 'PENDING' || name === 'CHỜ DUYỆT' || name === 'QUYẾT ĐỊNH ĐĂNG';
-      }
-      if (statusName.toUpperCase() === 'DRAFT') {
-        return name === 'DRAFT' || name === 'BẢN NHÁP' || name === 'NHÁP';
-      }
-      return name === statusName.toUpperCase();
-    });
+    const normalizedAction = statusName.toUpperCase();
+
+    const targetMode =
+      normalizedAction === 'PENDING'
+        ? (this.canApproveLevel2 ? 'APPROVED' : 'PENDING')
+        : 'DRAFT';
+    this.intendedSubmitStatus = targetMode;
+
+    const status = this.findStatusByMode(targetMode);
 
     if (!status) {
       globalThis.alert(`Không tìm thấy cấu hình trạng thái: ${statusName}`);
@@ -569,6 +567,27 @@ export class CreateNewsComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/news/management/dashboard']);
+  }
+
+  private findStatusByMode(mode: 'PENDING' | 'DRAFT' | 'APPROVED'): NewsStatusResponse | undefined {
+    const aliases: Record<'PENDING' | 'DRAFT' | 'APPROVED', string[]> = {
+      PENDING: ['PENDING', 'CHO DUYET'],
+      DRAFT: ['DRAFT', 'BAN NHAP', 'NHAP'],
+      APPROVED: ['APPROVE', 'APPROVED', 'QUYET DINH DANG'],
+    };
+
+    return this.statuses.find((s) => {
+      const normalized = this.normalizeStatusName(s.name);
+      return aliases[mode].includes(normalized);
+    });
+  }
+
+  private normalizeStatusName(name: string | null | undefined): string {
+    const raw = (name || '').trim().toUpperCase();
+    return raw
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ');
   }
 }
 
