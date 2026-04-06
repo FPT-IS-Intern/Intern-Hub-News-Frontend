@@ -337,6 +337,11 @@ export class CreateNewsComponent implements OnInit {
   // ACTIONS
 
   submitWithStatus(statusName: string): void {
+    if (this.loadingMeta) {
+      globalThis.alert('Đang tải cấu hình trạng thái, vui lòng thử lại sau vài giây.');
+      return;
+    }
+
     const normalizedAction = statusName.toUpperCase();
 
     const targetMode =
@@ -348,7 +353,13 @@ export class CreateNewsComponent implements OnInit {
     const status = this.findStatusByMode(targetMode);
 
     if (!status) {
-      globalThis.alert(`Không tìm thấy cấu hình trạng thái: ${statusName}`);
+      const availableStatuses = this.statuses
+        .map((s) => (s.name || '').trim())
+        .filter((name) => name.length > 0)
+        .join(', ');
+      globalThis.alert(
+        `Không tìm thấy cấu hình trạng thái phù hợp cho ${targetMode}. Trạng thái hiện có: ${availableStatuses || '(trống)'}`,
+      );
       return;
     }
 
