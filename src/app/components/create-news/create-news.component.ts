@@ -583,8 +583,8 @@ export class CreateNewsComponent implements OnInit {
   private findStatusByMode(mode: 'PENDING' | 'DRAFT' | 'APPROVED'): NewsStatusResponse | undefined {
     const aliases: Record<'PENDING' | 'DRAFT' | 'APPROVED', string[]> = {
       PENDING: ['PENDING', 'CHO DUYET'],
-      DRAFT: ['DRAFT', 'BAN NHAP', 'NHAP'],
-      APPROVED: ['APPROVE', 'APPROVED', 'QUYET DINH DANG'],
+      DRAFT: ['DRAFT', 'BAN NHAP', 'NHAP', 'LUU NHAP'],
+      APPROVED: ['APPROVE', 'APPROVED', 'QUYET DINH DANG', 'DA DUYET'],
     };
 
     return this.statuses.find((s) => {
