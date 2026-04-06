@@ -338,7 +338,6 @@ export class CreateNewsComponent implements OnInit {
 
   submitWithStatus(statusName: string): void {
     if (this.loadingMeta) {
-      globalThis.alert('Đang tải cấu hình trạng thái, vui lòng thử lại sau vài giây.');
       return;
     }
 
@@ -350,16 +349,20 @@ export class CreateNewsComponent implements OnInit {
         : 'DRAFT';
     this.intendedSubmitStatus = targetMode;
 
-    const status = this.findStatusByMode(targetMode);
+    let status = this.findStatusByMode(targetMode);
+
+    // Fallback: if publish-approved mapping is missing, fallback to pending to avoid blocking submit.
+    if (!status && targetMode === 'APPROVED') {
+      status = this.findStatusByMode('PENDING');
+      this.intendedSubmitStatus = 'PENDING';
+    }
 
     if (!status) {
-      const availableStatuses = this.statuses
-        .map((s) => (s.name || '').trim())
-        .filter((name) => name.length > 0)
-        .join(', ');
-      globalThis.alert(
-        `Không tìm thấy cấu hình trạng thái phù hợp cho ${targetMode}. Trạng thái hiện có: ${availableStatuses || '(trống)'}`,
-      );
+      console.error('[CreateNews] Missing status mapping for submit mode', {
+        statusName,
+        targetMode,
+        statuses: this.statuses?.map((s) => s?.name),
+      });
       return;
     }
 
@@ -598,6 +601,7 @@ export class CreateNewsComponent implements OnInit {
     return raw
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
+      .replace(/Đ/g, 'D')
       .replace(/\s+/g, ' ');
   }
 }
