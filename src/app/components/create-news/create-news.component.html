@@ -1,25 +1,25 @@
-<div class="create-news-page">
-  <!-- ── HEADER ── -->
+﻿<div class="create-news-page">
+  <!-- â”€â”€ HEADER â”€â”€ -->
   <div class="page-header">
     <div class="breadcrumb">
       <app-icon class="breadcrumb-icon" icon="dsi-home-01-line"></app-icon>
       <span class="breadcrumb-sep">/</span>
-      <button class="breadcrumb-link" type="button" (click)="goBack()">Tin tức</button>
+      <button class="breadcrumb-link" type="button" (click)="goBack()">Tin tá»©c</button>
       <span class="breadcrumb-sep">/</span>
-      <button class="breadcrumb-link" type="button" (click)="goBack()">Quản lý tin tức</button>
+      <button class="breadcrumb-link" type="button" (click)="goBack()">Quáº£n lÃ½ tin tá»©c</button>
       <span class="breadcrumb-sep">/</span>
       <span class="breadcrumb-current">{{
-        isEditMode ? 'Chỉnh sửa bài viết' : 'Tạo bài mới'
+        isEditMode ? 'Chá»‰nh sá»­a bÃ i viáº¿t' : 'Táº¡o bÃ i má»›i'
       }}</span>
     </div>
 
     <div class="header-row">
       <div class="header-left">
-        <h1 class="page-title">{{ isEditMode ? 'Chỉnh sửa bài viết' : 'Tạo bài tin tức mới' }}</h1>
+        <h1 class="page-title">{{ isEditMode ? 'Chá»‰nh sá»­a bÃ i viáº¿t' : 'Táº¡o bÃ i tin tá»©c má»›i' }}</h1>
       </div>
       <div class="header-actions">
         <app-button-container
-          content="Hủy bỏ"
+          content="Há»§y bá»"
           size="md"
           backgroundColor="transparent"
           color="var(--brand-600)"
@@ -31,7 +31,7 @@
     </div>
   </div>
 
-  <!-- ── BODY ── -->
+  <!-- â”€â”€ BODY â”€â”€ -->
   <div class="form-layout" [formGroup]="form">
     <!-- LEFT COLUMN - TITLE, DESC, CONTENT -->
     <div class="form-main">
@@ -39,7 +39,7 @@
       <div class="card title-desc-card">
         <div class="card-header">
           <app-icon class="card-icon" icon="dsi-edit-02-line"></app-icon>
-          <span class="card-title">Thông tin cơ bản</span>
+          <span class="card-title">ThÃ´ng tin cÆ¡ báº£n</span>
         </div>
         <div class="card-body">
           <div class="title-desc-row">
@@ -47,8 +47,8 @@
             <div class="field-group flex-1">
               <app-input-text
                 id="news-title"
-                headerInput="Tiêu đề bài viết"
-                placeholder="Nhập tiêu đề..."
+                headerInput="TiÃªu Ä‘á» bÃ i viáº¿t"
+                placeholder="Nháº­p tiÃªu Ä‘á»..."
                 [required]="true"
                 [maxLength]="150"
                 [showLimit]="true"
@@ -65,8 +65,8 @@
             <div class="field-group flex-1">
               <app-input-text
                 id="news-short-description"
-                headerInput="Mô tả ngắn"
-                placeholder="Tóm tắt nội dung..."
+                headerInput="MÃ´ táº£ ngáº¯n"
+                placeholder="TÃ³m táº¯t ná»™i dung..."
                 [required]="true"
                 [maxLength]="255"
                 [showLimit]="true"
@@ -87,12 +87,12 @@
       <div class="card">
         <div class="card-header">
           <app-icon class="card-icon" icon="dsi-file-02-line"></app-icon>
-          <span class="card-title">Nội dung bài viết</span>
+          <span class="card-title">Ná»™i dung bÃ i viáº¿t</span>
         </div>
         <div class="card-body">
           <div class="field-group">
             <label class="field-label" for="news-body-quill">
-              Nội dung chi tiết <span class="required-star">*</span>
+              Ná»™i dung chi tiáº¿t <span class="required-star">*</span>
             </label>
             <quill-editor id="news-body-quill" formControlName="body"></quill-editor>
             @if (bodyError) {
@@ -109,12 +109,12 @@
       <div class="card">
         <div class="card-header">
           <app-icon class="card-icon" icon="dsi-activity-line"></app-icon>
-          <span class="card-title">Trạng thái bài viết</span>
+          <span class="card-title">Tráº¡ng thÃ¡i bÃ i viáº¿t</span>
         </div>
         <div class="card-body">
           <div class="status-display">
-            <span class="status-label">Hiện tại:</span>
-            <span class="status-value" [class.is-draft]="getStatusName() === 'Nháp'">
+            <span class="status-label">Hiá»‡n táº¡i:</span>
+            <span class="status-value" [class.is-draft]="getStatusName() === 'NhÃ¡p'">
               {{ getStatusName() }}
             </span>
           </div>
@@ -123,7 +123,7 @@
             @if (!isEditMode) {
               @if (!submitting) {
                 <app-button-container
-                  content="Lưu bản nháp"
+                  content="LÆ°u báº£n nhÃ¡p"
                   size="md"
                   backgroundColor="transparent"
                   color="var(--brand-600)"
@@ -135,14 +135,14 @@
               } @else {
                 <button type="button" class="submit-loading-btn draft" disabled>
                   <span class="btn-spinner" aria-hidden="true"></span>
-                  <span>Đang xử lý...</span>
+                  <span>Äang xá»­ lÃ½...</span>
                 </button>
               }
             }
 
             @if (!submitting) {
               <app-button-container
-                [content]="isEditMode ? 'Cập nhật bài viết' : 'Đăng bài ngay'"
+                [content]="isEditMode ? 'Cáº­p nháº­t bÃ i viáº¿t' : 'ÄÄƒng bÃ i ngay'"
                 size="md"
                 backgroundColor="var(--brand-600)"
                 color="var(--neutral-color-10)"
@@ -153,7 +153,7 @@
             } @else {
               <button type="button" class="submit-loading-btn primary" disabled>
                 <span class="btn-spinner" aria-hidden="true"></span>
-                <span>{{ isEditMode ? 'Đang cập nhật...' : 'Đang tạo bài...' }}</span>
+                <span>{{ isEditMode ? 'Äang cáº­p nháº­t...' : 'Äang táº¡o bÃ i...' }}</span>
               </button>
             }
           </div>
@@ -167,7 +167,7 @@
             <div class="option-label">
               <app-icon class="option-icon" icon="dsi-star-01-line"></app-icon>
               <div>
-                <div class="option-name">Đánh dấu nổi bật</div>
+                <div class="option-name">ÄÃ¡nh dáº¥u ná»•i báº­t</div>
               </div>
             </div>
             <label class="switch-like">
@@ -175,8 +175,8 @@
                 id="news-featured"
                 type="checkbox"
                 formControlName="featured"
-                title="Bài viết nổi bật"
-                aria-label="Bài viết nổi bật"
+                title="BÃ i viáº¿t ná»•i báº­t"
+                aria-label="BÃ i viáº¿t ná»•i báº­t"
               />
               <span class="switch-ui"></span>
             </label>
@@ -188,10 +188,10 @@
       <div class="card thumbnail-card">
         <div class="card-header">
           <app-icon class="card-icon" icon="dsi-image-01-line"></app-icon>
-          <span class="card-title">Ảnh bìa</span>
+          <span class="card-title">áº¢nh bÃ¬a</span>
           @if (thumbnailPreview) {
             <app-button-container
-              content="Xóa"
+              content="XÃ³a"
               leftIcon="dsi-trash-line"
               size="xs"
               backgroundColor="transparent"
@@ -207,7 +207,7 @@
               type="button"
               class="drop-zone"
               [class.drag-over]="isDraggingOver"
-              aria-label="Kéo ảnh vào đây hoặc click để chọn từ máy tính"
+              aria-label="KÃ©o áº£nh vÃ o Ä‘Ã¢y hoáº·c click Ä‘á»ƒ chá»n tá»« mÃ¡y tÃ­nh"
               (click)="triggerFileInput()"
               (keydown.enter)="triggerFileInput()"
               (keydown.space)="triggerFileInput(); $event.preventDefault()"
@@ -219,8 +219,8 @@
                 <div class="drop-icon-wrapper">
                   <app-icon class="drop-icon" icon="dsi-cloud-upload-line"></app-icon>
                 </div>
-                <p class="drop-text-main">Kéo ảnh vào đây</p>
-                <p class="drop-text-sub">hoặc <span class="browse-link">chọn từ máy tính</span></p>
+                <p class="drop-text-main">KÃ©o áº£nh vÃ o Ä‘Ã¢y</p>
+                <p class="drop-text-sub">hoáº·c <span class="browse-link">chá»n tá»« mÃ¡y tÃ­nh</span></p>
               </div>
             </button>
           } @else {
@@ -234,13 +234,13 @@
               <button
                 type="button"
                 class="thumb-overlay"
-                aria-label="Thay đổi ảnh bìa"
+                aria-label="Thay Ä‘á»•i áº£nh bÃ¬a"
                 (click)="triggerFileInput()"
                 (keydown.enter)="triggerFileInput()"
                 (keydown.space)="triggerFileInput(); $event.preventDefault()"
               >
                 <app-icon icon="dsi-refresh-01-line"></app-icon>
-                <span>Thay ảnh</span>
+                <span>Thay áº£nh</span>
               </button>
             </div>
           }
@@ -258,13 +258,13 @@
       <div class="card">
         <div class="card-header">
           <app-icon class="card-icon" icon="dsi-tag-01-line"></app-icon>
-          <span class="card-title">Chủ đề</span>
+          <span class="card-title">Chá»§ Ä‘á»</span>
         </div>
         <div class="card-body">
           <!-- Topic -->
           <div class="field-group">
             <label class="field-label"
-              >Chủ đề <span class="label-hint">(không bắt buộc)</span></label
+              >Chá»§ Ä‘á» <span class="label-hint">(khÃ´ng báº¯t buá»™c)</span></label
             >
             <div
               class="dropdown-container"
@@ -274,11 +274,11 @@
               <button
                 type="button"
                 class="dropdown-trigger-overlay"
-                aria-label="Mở danh sách chọn chủ đề"
+                aria-label="Má»Ÿ danh sÃ¡ch chá»n chá»§ Ä‘á»"
               ></button>
               <app-input-text
                 id="news-topic"
-                placeholder="Chọn chủ đề..."
+                placeholder="Chá»n chá»§ Ä‘á»..."
                 [value]="selectedTopicNames"
                 [icon]="showTopicDropdown ? 'dsi-chevron-up-line' : 'dsi-chevron-down-line'"
                 [readonly]="true"
@@ -289,7 +289,7 @@
                 (click)="toggleTopicDropdown($event)"
                 (keydown.enter)="toggleTopicDropdown($event)"
                 (keydown.space)="toggleTopicDropdown($event); $event.preventDefault()"
-                title="Chọn chủ đề"
+                title="Chá»n chá»§ Ä‘á»"
               ></app-input-text>
 
               @if (showTopicDropdown) {
@@ -322,8 +322,25 @@
     </div>
     @if (loadingMeta) {
       <div class="loading-overlay">
-        <div class="loading-box">Đang tải dữ liệu...</div>
+        <div class="loading-box">Äang táº£i dá»¯ liá»‡u...</div>
       </div>
     }
   </div>
 </div>
+
+@if (showApprovalNoticePopup) {
+  <div class="approval-popup-overlay" (click)="closeApprovalNoticePopup()">
+    <div class="approval-popup-container" (click)="$event.stopPropagation()">
+      <div class="approval-popup-title">Th&ocirc;ng b&aacute;o</div>
+      <div class="approval-popup-message">
+        B&agrave;i &#273;&#259;ng s&#7869; &#273;&#432;&#7907;c &#273;&#259;ng khi &#273;&#432;&#7907;c
+        ph&ecirc; duy&#7879;t.
+      </div>
+      <div class="approval-popup-actions">
+        <button type="button" class="approval-popup-btn" (click)="closeApprovalNoticePopup()">
+          &#272;&atilde; hi&#7875;u
+        </button>
+      </div>
+    </div>
+  </div>
+}

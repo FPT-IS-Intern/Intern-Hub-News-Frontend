@@ -378,6 +378,56 @@
   pointer-events: none;
 }
 
+.approval-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+
+.approval-popup-container {
+  width: min(420px, 92vw);
+  background: var(--neutral-color-10);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
+  padding: 22px 20px 18px;
+  border: 1px solid var(--brand-100);
+}
+
+.approval-popup-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--brand-700);
+  margin-bottom: 10px;
+}
+
+.approval-popup-message {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--neutral-color-700);
+}
+
+.approval-popup-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.approval-popup-btn {
+  min-width: 92px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--brand-300);
+  background: var(--brand-600);
+  color: var(--neutral-color-10);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .drop-icon-wrapper {
   width: 60px;
   height: 60px;
