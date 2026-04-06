@@ -70,6 +70,10 @@ export class CreateNewsComponent implements OnInit {
   shortDescriptionValue = '';
   bodyValue = '';
   showApprovalNoticePopup = false;
+  approvalPopupTitle = 'Đang chờ phê duyệt';
+  approvalPopupSubtitle = 'Bài đăng sẽ được đăng khi được phê duyệt.';
+  approvalPopupConfirmText = 'Phiếu của tôi';
+  private approvalPopupNavigateUrl = '/ticket/my-ticket';
   private canApproveLevel2 = false;
   private intendedSubmitStatus: 'PENDING' | 'DRAFT' | 'APPROVED' | null = null;
 
@@ -458,14 +462,26 @@ export class CreateNewsComponent implements OnInit {
           const needApprovalNotice =
             !this.isEditMode && this.intendedSubmitStatus === 'PENDING' && !this.canApproveLevel2;
 
-          if (needApprovalNotice) {
-            this.showApprovalNoticePopup = true;
+          if (!this.isEditMode) {
+            if (needApprovalNotice) {
+              this.openApprovalNoticePopup(
+                'Đang chờ phê duyệt',
+                'Bài đăng sẽ được đăng khi được phê duyệt.',
+                'Phiếu của tôi',
+                '/ticket/my-ticket',
+              );
+            } else {
+              this.openApprovalNoticePopup(
+                'Đăng bài thành công',
+                'Bài viết đã được đăng thành công.',
+                'Về quản lý tin',
+                '/news/management/dashboard',
+              );
+            }
             return;
           }
 
-          globalThis.alert(
-            this.isEditMode ? 'Cập nhật tin tức thành công!' : 'Tạo bài tin tức thành công!',
-          );
+          globalThis.alert('Cập nhật tin tức thành công!');
           this.router.navigate(['/news/management/dashboard']);
         },
         error: (err) => {
@@ -483,7 +499,20 @@ export class CreateNewsComponent implements OnInit {
 
   confirmApprovalNoticePopup(): void {
     this.showApprovalNoticePopup = false;
-    this.router.navigate(['/ticket/my-ticket']);
+    this.router.navigate([this.approvalPopupNavigateUrl]);
+  }
+
+  private openApprovalNoticePopup(
+    title: string,
+    subtitle: string,
+    confirmText: string,
+    navigateUrl: string,
+  ): void {
+    this.approvalPopupTitle = title;
+    this.approvalPopupSubtitle = subtitle;
+    this.approvalPopupConfirmText = confirmText;
+    this.approvalPopupNavigateUrl = navigateUrl;
+    this.showApprovalNoticePopup = true;
   }
   private buildThumbnailUrl(objectKey: string): string {
     if (!objectKey) {

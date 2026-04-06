@@ -334,17 +334,14 @@
       <div class="popup-icon">
         <img src="app/shared/assest/pending.svg" alt="pending" />
       </div>
-      <div class="popup-title">&#272;ang ch&#7901; ph&ecirc; duy&#7879;t</div>
-      <div class="popup-subtitle">
-        B&agrave;i &#273;&#259;ng s&#7869; &#273;&#432;&#7907;c &#273;&#259;ng khi &#273;&#432;&#7907;c ph&ecirc;
-        duy&#7879;t.
-      </div>
+      <div class="popup-title">{{ approvalPopupTitle }}</div>
+      <div class="popup-subtitle">{{ approvalPopupSubtitle }}</div>
       <div class="popup-actions">
         <button type="button" class="popup-btn btn-exit" (click)="closeApprovalNoticePopup()">
           Tho&aacute;t
         </button>
         <button type="button" class="popup-btn btn-confirm" (click)="confirmApprovalNoticePopup()">
-          Phi&#7871;u c&#7911;a t&#244;i
+          {{ approvalPopupConfirmText }}
         </button>
       </div>
     </div>
