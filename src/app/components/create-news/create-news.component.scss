@@ -194,17 +194,6 @@
   gap: 12px;
 }
 
-.submit-error-message {
-  margin-top: 4px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid color-mix(in srgb, var(--utility-600) 30%, transparent);
-  background: color-mix(in srgb, var(--utility-600) 8%, transparent);
-  color: var(--utility-600);
-  font-size: 12px;
-  line-height: 1.4;
-}
-
 .submit-loading-btn {
   width: 100%;
   height: 40px;
