@@ -181,7 +181,7 @@
     color: var(--utility-600);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    
+
     &.is-draft {
       color: var(--brand-600);
     }
@@ -192,6 +192,51 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.submit-loading-btn {
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: not-allowed;
+  opacity: 0.9;
+
+  &.primary {
+    background: var(--brand-600);
+    color: var(--neutral-color-10);
+  }
+
+  &.draft {
+    background: var(--neutral-color-10);
+    color: var(--brand-600);
+    border-color: var(--brand-300);
+  }
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: submit-spinner-rotate 0.7s linear infinite;
+}
+
+@keyframes submit-spinner-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // ── Field Groups ─────────────────────────────────────────────────────────────
@@ -242,7 +287,9 @@
   font-size: 14px;
   color: var(--brand-700);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 
   &:hover,
   &:focus {
@@ -269,7 +316,9 @@
   color: var(--brand-700);
   background: var(--neutral-color-0, #fff);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 
   &:hover,
   &:focus {
@@ -426,7 +475,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  
+
   // Custom styling when used as a prominent frame
   &.featured-row {
     background-color: var(--brand-10);
@@ -434,7 +483,7 @@
     padding: 12px 16px;
     border-radius: 10px;
     margin-bottom: 24px;
-    
+
     .option-label {
       margin-bottom: 0; // Reset the margin added by USER
     }
@@ -496,7 +545,10 @@
 
   // Thêm hiệu ứng transition cho icon bên trong Input
   ::ng-deep app-input-text {
-    [class*="dsi-"], .input-icon, .icon-right, app-icon {
+    [class*='dsi-'],
+    .input-icon,
+    .icon-right,
+    app-icon {
       transition: transform 0.3s ease-in-out !important;
       transform-origin: center;
       display: inline-block;
@@ -508,7 +560,10 @@
 
     // Khi bật menu thì xoay icon 180 độ
     ::ng-deep app-input-text {
-      [class*="dsi-"], .input-icon, .icon-right, app-icon {
+      [class*='dsi-'],
+      .input-icon,
+      .icon-right,
+      app-icon {
         transform: rotate(-180deg) !important;
       }
     }
@@ -609,7 +664,7 @@
     background-color: var(--brand-10);
     padding: 12px;
   }
-  
+
   .ql-container.ql-snow {
     border: 1px solid var(--brand-200);
     border-top: none;
@@ -623,7 +678,7 @@
 
   .ql-editor {
     min-height: 500px; // Tăng chiều cao tối thiểu
-    
+
     &.ql-blank::before {
       color: var(--brand-200);
       font-style: normal;

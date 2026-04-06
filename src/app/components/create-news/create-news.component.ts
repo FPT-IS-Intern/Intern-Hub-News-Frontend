@@ -8,12 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { QuillEditorComponent } from 'ngx-quill';
 
 import {
@@ -25,6 +20,7 @@ import {
 import { forkJoin, of, switchMap, catchError } from 'rxjs';
 import { DmsService } from '../../services/dms.service';
 import { ImageUtils } from '../../utils/image.utils';
+import { getS3DomainUrl } from '../../core/config/app-config';
 import {
   CreateNewsRequest,
   UpdateNewsRequest,
@@ -73,6 +69,8 @@ export class CreateNewsComponent implements OnInit {
   shortDescriptionValue = '';
   bodyValue = '';
 
+  private readonly s3DomainUrl = getS3DomainUrl();
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly router: Router,
@@ -82,7 +80,7 @@ export class CreateNewsComponent implements OnInit {
     private readonly statusService: NewsStatusService,
     private readonly dmsService: DmsService,
     private readonly cdr: ChangeDetectorRef,
-    private readonly el: ElementRef
+    private readonly el: ElementRef,
   ) {}
 
   ngOnInit(): void {
@@ -211,7 +209,7 @@ export class CreateNewsComponent implements OnInit {
   getStatusName(): string {
     const statusId = this.form.get('statusId')?.value;
     if (!statusId) return this.isEditMode ? 'Chờ duyệt' : 'Nháp';
-    const status = this.statuses.find(s => s.id === statusId);
+    const status = this.statuses.find((s) => s.id === statusId);
     if (!status) return 'Nháp';
     const name = status.name?.toUpperCase();
     if (name === 'APPROVE' || name === 'QUYẾT ĐỊNH ĐĂNG') return 'Đã duyệt';
@@ -363,10 +361,17 @@ export class CreateNewsComponent implements OnInit {
       title: values.title,
       shortDescription: values.shortDescription,
       body: values.body,
-      topicIds: values.topicIds && values.topicIds.length > 0 ? values.topicIds : (this.isEditMode ? [] : undefined),
+      topicIds:
+        values.topicIds && values.topicIds.length > 0
+          ? values.topicIds
+          : this.isEditMode
+            ? []
+            : undefined,
       statusId: values.statusId,
       featured: values.featured,
-      thumbnail: this.currentThumbnailKey ?? undefined,
+      thumbnail: this.currentThumbnailKey
+        ? this.toThumbnailUrl(this.currentThumbnailKey)
+        : undefined,
     } as any;
 
     let uploadObs = of<string | null>(null);
@@ -376,56 +381,157 @@ export class CreateNewsComponent implements OnInit {
     const isFileRemoved = !this.thumbnailPreview && !!this.currentThumbnailKey;
 
     if (hasNewFile) {
-      // TRƯỜNG HỢP 1: Chọn file mới -> Upload lên DMS
       let deleteObs = of<any>(null);
-      // Nếu đang sửa và có ảnh cũ, xóa ảnh cũ trước khi upload mới
-      if (this.isEditMode && this.currentThumbnailKey) {
-        deleteObs = this.dmsService.delete(this.currentThumbnailKey).pipe(
-          catchError(() => of(null))
-        );
+      if (this.currentThumbnailKey) {
+        const oldObjectKey = this.extractObjectKey(this.currentThumbnailKey);
+        if (oldObjectKey) {
+          deleteObs = this.dmsService.delete(oldObjectKey).pipe(catchError(() => of(null)));
+        }
       }
 
       uploadObs = deleteObs.pipe(
         switchMap(() => this.dmsService.upload(this.selectedFile!)),
-        switchMap((res) => of(res.data.objectKey))
+        switchMap((res) => {
+          const objectKey = this.extractUploadObjectKey(res.data);
+          const thumbnailUrl = objectKey ? this.buildThumbnailUrl(objectKey) : '';
+          return of(thumbnailUrl);
+        }),
       );
-    } 
-    else if (isFileRemoved && this.isEditMode) {
-      // TRƯỜNG HỢP 2: Người dùng xóa ảnh cũ -> Chỉ gọi Delete DMS
-      uploadObs = this.dmsService.delete(this.currentThumbnailKey!).pipe(
-        switchMap(() => of('')), // Trả về chuỗi rỗng để backend xóa field thumbnail
-        catchError(() => of(''))
-      );
-    }
-    // Nếu không thuộc 2 trường hợp trên (không thay đổi), uploadObs = of(null) -> Giữ nguyên thumbnail cũ
-
-    uploadObs.pipe(
-      switchMap((objectKey) => {
-        if (objectKey !== null) {
-          requestBody.thumbnail = objectKey;
-        }
-
-        if (this.isEditMode) {
-          return this.newsService.update(this.newsId!, requestBody as UpdateNewsRequest);
-        } else {
-          return this.newsService.create(requestBody as CreateNewsRequest);
-        }
-      })
-    ).subscribe({
-      next: () => {
-        this.submitting = false;
-        globalThis.alert(
-          this.isEditMode ? 'Cập nhật tin tức thành công!' : 'Tạo bài tin tức thành công!'
+    } else if (isFileRemoved && this.isEditMode) {
+      const oldObjectKey = this.extractObjectKey(this.currentThumbnailKey);
+      if (oldObjectKey) {
+        uploadObs = this.dmsService.delete(oldObjectKey).pipe(
+          switchMap(() => of('')), // Trả về chuỗi rỗng để backend xóa field thumbnail
+          catchError(() => of('')),
         );
-        this.router.navigate(['/news/management/dashboard']);
-      },
-      error: (err) => {
-        this.submitting = false;
-        console.error('Submit error:', err);
-        const errorMsg = err?.error?.status?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
-        globalThis.alert(errorMsg);
-      },
-    });
+      } else {
+        uploadObs = of('');
+      }
+    }
+    uploadObs
+      .pipe(
+        switchMap((thumbnailValue) => {
+          if (thumbnailValue !== null) {
+            requestBody.thumbnail =
+              thumbnailValue === '' ? '' : this.toThumbnailUrl(thumbnailValue);
+          }
+
+          if (this.isEditMode) {
+            return this.newsService.update(this.newsId!, requestBody as UpdateNewsRequest);
+          } else {
+            return this.newsService.create(requestBody as CreateNewsRequest);
+          }
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.submitting = false;
+          globalThis.alert(
+            this.isEditMode ? 'Cập nhật tin tức thành công!' : 'Tạo bài tin tức thành công!',
+          );
+          this.router.navigate(['/news/management/dashboard']);
+        },
+        error: (err) => {
+          this.submitting = false;
+          console.error('Submit error:', err);
+          const errorMsg = err?.error?.status?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
+          globalThis.alert(errorMsg);
+        },
+      });
+  }
+
+  private buildThumbnailUrl(objectKey: string): string {
+    if (!objectKey) {
+      return '';
+    }
+
+    const cleanKey = objectKey.replace(/^\/+/, '');
+    if (!this.s3DomainUrl) {
+      return cleanKey;
+    }
+
+    const cleanDomain = this.s3DomainUrl.replace(/\/+$/, '');
+    return `${cleanDomain}/${cleanKey}`;
+  }
+
+  private toThumbnailUrl(value: string): string {
+    if (!value) {
+      return '';
+    }
+
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      return value;
+    }
+
+    return this.buildThumbnailUrl(value);
+  }
+
+  private extractObjectKey(thumbnailValue: string | null | undefined): string | null {
+    if (!thumbnailValue) {
+      return null;
+    }
+
+    if (!thumbnailValue.startsWith('http://') && !thumbnailValue.startsWith('https://')) {
+      return this.normalizeObjectKey(thumbnailValue) || null;
+    }
+
+    try {
+      const parsed = new URL(thumbnailValue);
+
+      const queryKey = parsed.searchParams.get('key');
+      if (queryKey) {
+        return this.normalizeObjectKey(queryKey) || null;
+      }
+
+      // If thumbnail is full URL from DB, remove exactly the shell env prefix length
+      if (this.s3DomainUrl) {
+        const cleanDomain = this.s3DomainUrl.replace(/\/+$/, '');
+        if (thumbnailValue === cleanDomain) {
+          return null;
+        }
+        if (thumbnailValue.startsWith(cleanDomain)) {
+          return this.normalizeObjectKey(thumbnailValue.substring(cleanDomain.length)) || null;
+        }
+      }
+
+      return this.normalizeObjectKey(parsed.pathname) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  private extractUploadObjectKey(data: any): string {
+    if (!data) {
+      return '';
+    }
+
+    if (typeof data.objectKey === 'string') {
+      return this.normalizeObjectKey(data.objectKey);
+    }
+
+    if (Array.isArray(data.objectKeys) && typeof data.objectKeys[0] === 'string') {
+      return this.normalizeObjectKey(data.objectKeys[0]);
+    }
+
+    return '';
+  }
+
+  private normalizeObjectKey(rawKey: string): string {
+    if (!rawKey) {
+      return '';
+    }
+
+    const trimmed = rawKey.trim();
+    if (!trimmed) {
+      return '';
+    }
+
+    try {
+      // Handle cases where backend returns URL-encoded object key (e.g. news%2Fthumbnails%2F...)
+      return decodeURIComponent(trimmed).replace(/^\/+/, '');
+    } catch {
+      return trimmed.replace(/^\/+/, '');
+    }
   }
 
   goBack(): void {

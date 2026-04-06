@@ -12,9 +12,25 @@ export function getBaseUrl(): string {
 export function getFileBaseUrl(): string {
   const shellEnv = (window as any).__env;
 
-  if (shellEnv && shellEnv.newsFileBaseUrl) {
-    return shellEnv.newsFileBaseUrl;
+  if (!shellEnv) {
+    return '';
   }
 
-  return '';
+  return shellEnv.newsFileBaseUrl || shellEnv.storageFileBaseUrl || '';
+}
+
+export function getS3DomainUrl(): string {
+  const shellEnv = (window as any).__env;
+
+  if (!shellEnv) {
+    return '';
+  }
+
+  return (
+    shellEnv.s3DomainUrl ||
+    shellEnv.s3DomainURL ||
+    shellEnv.s3Domain ||
+    shellEnv.storageFileBaseUrl ||
+    ''
+  );
 }

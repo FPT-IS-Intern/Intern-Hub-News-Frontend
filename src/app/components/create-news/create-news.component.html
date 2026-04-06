@@ -8,7 +8,9 @@
       <span class="breadcrumb-sep">/</span>
       <button class="breadcrumb-link" type="button" (click)="goBack()">Quản lý tin tức</button>
       <span class="breadcrumb-sep">/</span>
-      <span class="breadcrumb-current">{{ isEditMode ? 'Chỉnh sửa bài viết' : 'Tạo bài mới' }}</span>
+      <span class="breadcrumb-current">{{
+        isEditMode ? 'Chỉnh sửa bài viết' : 'Tạo bài mới'
+      }}</span>
     </div>
 
     <div class="header-row">
@@ -92,10 +94,7 @@
             <label class="field-label" for="news-body-quill">
               Nội dung chi tiết <span class="required-star">*</span>
             </label>
-            <quill-editor
-              id="news-body-quill"
-              formControlName="body"
-            ></quill-editor>
+            <quill-editor id="news-body-quill" formControlName="body"></quill-editor>
             @if (bodyError) {
               <span class="error-msg">{{ bodyError }}</span>
             }
@@ -122,27 +121,41 @@
 
           <div class="sidebar-actions-stacked">
             @if (!isEditMode) {
-              <app-button-container
-                content="Lưu bản nháp"
-                size="md"
-                backgroundColor="transparent"
-                color="var(--brand-600)"
-                borderColor="var(--brand-300)"
-                borderRadius="8px"
-                width="100%"
-                (buttonClick)="submitWithStatus('DRAFT')"
-              ></app-button-container>
+              @if (!submitting) {
+                <app-button-container
+                  content="Lưu bản nháp"
+                  size="md"
+                  backgroundColor="transparent"
+                  color="var(--brand-600)"
+                  borderColor="var(--brand-300)"
+                  borderRadius="8px"
+                  width="100%"
+                  (buttonClick)="submitWithStatus('DRAFT')"
+                ></app-button-container>
+              } @else {
+                <button type="button" class="submit-loading-btn draft" disabled>
+                  <span class="btn-spinner" aria-hidden="true"></span>
+                  <span>Đang xử lý...</span>
+                </button>
+              }
             }
 
-            <app-button-container
-              [content]="isEditMode ? 'Cập nhật bài viết' : 'Đăng bài ngay'"
-              size="md"
-              backgroundColor="var(--brand-600)"
-              color="var(--neutral-color-10)"
-              borderRadius="8px"
-              width="100%"
-              (buttonClick)="submitWithStatus('PENDING')"
-            ></app-button-container>
+            @if (!submitting) {
+              <app-button-container
+                [content]="isEditMode ? 'Cập nhật bài viết' : 'Đăng bài ngay'"
+                size="md"
+                backgroundColor="var(--brand-600)"
+                color="var(--neutral-color-10)"
+                borderRadius="8px"
+                width="100%"
+                (buttonClick)="submitWithStatus('PENDING')"
+              ></app-button-container>
+            } @else {
+              <button type="button" class="submit-loading-btn primary" disabled>
+                <span class="btn-spinner" aria-hidden="true"></span>
+                <span>{{ isEditMode ? 'Đang cập nhật...' : 'Đang tạo bài...' }}</span>
+              </button>
+            }
           </div>
         </div>
       </div>
@@ -250,8 +263,14 @@
         <div class="card-body">
           <!-- Topic -->
           <div class="field-group">
-            <label class="field-label">Chủ đề <span class="label-hint">(không bắt buộc)</span></label>
-            <div class="dropdown-container" [class.is-open]="showTopicDropdown" (click)="toggleTopicDropdown($event)">
+            <label class="field-label"
+              >Chủ đề <span class="label-hint">(không bắt buộc)</span></label
+            >
+            <div
+              class="dropdown-container"
+              [class.is-open]="showTopicDropdown"
+              (click)="toggleTopicDropdown($event)"
+            >
               <button
                 type="button"
                 class="dropdown-trigger-overlay"
@@ -282,7 +301,9 @@
                       [class.selected]="isTopicSelected(topic.id)"
                       (click)="selectTopic(topic); $event.stopPropagation()"
                       (keydown.enter)="selectTopic(topic); $event.stopPropagation()"
-                      (keydown.space)="selectTopic(topic); $event.stopPropagation(); $event.preventDefault()"
+                      (keydown.space)="
+                        selectTopic(topic); $event.stopPropagation(); $event.preventDefault()
+                      "
                     >
                       <div class="custom-checkbox" [class.checked]="isTopicSelected(topic.id)">
                         @if (isTopicSelected(topic.id)) {

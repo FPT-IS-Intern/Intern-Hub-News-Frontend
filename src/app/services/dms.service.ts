@@ -32,24 +32,24 @@ export interface DmsApiResult<T> {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DmsService {
   private readonly baseUrl = `${getBaseUrl()}/dms/admin`;
 
   constructor(private readonly http: HttpClient) {}
 
-  upload(file: File, destinationPath: string = 'news/thumbnails'): Observable<DmsApiResult<DmsResponse>> {
+  upload(file: File, destinationPath: string = 'news'): Observable<DmsApiResult<DmsResponse>> {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     return this.http.post<DmsApiResult<DmsResponse>>(
-      `${this.baseUrl}?destinationPath=${destinationPath}`,
-      formData
+      `${this.baseUrl}?destinationPath=${encodeURIComponent(destinationPath)}`,
+      formData,
     );
   }
 
-  delete(key: string): Observable<DmsApiResult<any>> {
-    return this.http.delete<DmsApiResult<any>>(`${this.baseUrl}?key=${key}`);
+  delete(key: string): Observable<DmsApiResult<string>> {
+    return this.http.delete<DmsApiResult<string>>(`${this.baseUrl}?key=${encodeURIComponent(key)}`);
   }
 }
