@@ -58,6 +58,8 @@ export class CreateNewsComponent implements OnInit {
   thumbnailPreview: string | null = null;
   selectedFile: File | null = null;
   currentThumbnailKey: string | null = null;
+  removedThumbnailObjectKey: string | null = null;
+  thumbnailTouched = false;
   isDraggingOver = false;
 
   // Custom Dropdown State
@@ -137,7 +139,7 @@ export class CreateNewsComponent implements OnInit {
             title: news.title,
             shortDescription: news.shortDescription,
             body: news.body,
-            topicIds: news.topics ? news.topics.map((t: any) => t.id) : [],
+            topicIds: news.topics && news.topics.length > 0 ? [news.topics[0].id] : [],
             statusId: foundStatus ? foundStatus.id : null,
             featured: news.featured,
           });
@@ -146,6 +148,8 @@ export class CreateNewsComponent implements OnInit {
           this.shortDescriptionValue = news.shortDescription;
           this.bodyValue = news.body;
           this.currentThumbnailKey = news.thumbNail || null;
+          this.removedThumbnailObjectKey = null;
+          this.thumbnailTouched = false;
           this.thumbnailPreview = ImageUtils.getFileUrl(news.thumbNail);
           this.cdr.markForCheck();
         }
@@ -158,7 +162,7 @@ export class CreateNewsComponent implements OnInit {
       title: ['', [Validators.required, Validators.maxLength(150)]],
       shortDescription: ['', [Validators.required, Validators.maxLength(255)]],
       body: ['', [Validators.required]],
-      topicIds: [[]],
+      topicIds: [[], [Validators.required]],
       statusId: [null, [Validators.required]],
       featured: [false],
     });
@@ -241,15 +245,12 @@ export class CreateNewsComponent implements OnInit {
   get selectedTopicNames(): string {
     const ids: string[] = this.form.get('topicIds')?.value || [];
     if (ids.length === 0) return '';
-    return this.topics
-      .filter((t) => ids.includes(t.id))
-      .map((t) => t.name)
-      .join(', ');
+    return this.topics.find((t) => t.id === ids[0])?.name || '';
   }
 
   isTopicSelected(topicId: string): boolean {
     const ids: string[] = this.form.get('topicIds')?.value || [];
-    return ids.includes(topicId);
+    return ids[0] === topicId;
   }
 
   get selectedStatusName(): string {
@@ -265,15 +266,26 @@ export class CreateNewsComponent implements OnInit {
   }
 
   selectTopic(topic: NewsTopicResponse): void {
-    const ids: string[] = this.form.get('topicIds')?.value || [];
-    const index = ids.indexOf(topic.id);
-    if (index > -1) {
-      ids.splice(index, 1);
-    } else {
-      ids.push(topic.id);
-    }
-    this.form.get('topicIds')?.setValue([...ids]);
+    this.form.get('topicIds')?.setValue([topic.id]);
+    this.form.get('topicIds')?.markAsDirty();
+    this.form.get('topicIds')?.markAsTouched();
+    this.showTopicDropdown = false;
     this.cdr.markForCheck();
+  }
+
+  get topicError(): string {
+    const ctrl = this.form.get('topicIds');
+    if ((ctrl?.dirty || ctrl?.touched) && ctrl?.hasError('required')) {
+      return 'Chủ đề là bắt buộc';
+    }
+    return '';
+  }
+
+  get thumbnailError(): string {
+    if (this.thumbnailTouched && !this.hasThumbnail()) {
+      return 'Ảnh bìa là bắt buộc';
+    }
+    return '';
   }
 
   // THUMBNAIL UPLOAD
@@ -319,6 +331,7 @@ export class CreateNewsComponent implements OnInit {
       return;
     }
     this.selectedFile = file;
+    this.thumbnailTouched = true;
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = e.target?.result as string;
@@ -329,8 +342,13 @@ export class CreateNewsComponent implements OnInit {
   }
 
   removeThumbnail(): void {
+    if (this.currentThumbnailKey) {
+      this.removedThumbnailObjectKey = this.extractObjectKey(this.currentThumbnailKey);
+    }
+    this.currentThumbnailKey = null;
     this.thumbnailPreview = null;
     this.selectedFile = null;
+    this.thumbnailTouched = true;
   }
 
   triggerFileInput(): void {
@@ -385,6 +403,8 @@ export class CreateNewsComponent implements OnInit {
       ctrl.updateValueAndValidity({ onlySelf: true });
     });
 
+    this.thumbnailTouched = true;
+    if (!this.hasThumbnail()) return;
     if (this.form.invalid) return;
 
     this.submitting = true;
@@ -411,15 +431,15 @@ export class CreateNewsComponent implements OnInit {
 
     // Chỉ thực hiện xử lý ảnh nếu có sự thay đổi (chọn file mới hoặc xóa file cũ)
     const hasNewFile = !!this.selectedFile;
-    const isFileRemoved = !this.thumbnailPreview && !!this.currentThumbnailKey;
+    const isFileRemoved = !this.thumbnailPreview && !!this.removedThumbnailObjectKey;
 
     if (hasNewFile) {
       let deleteObs = of<any>(null);
-      if (this.currentThumbnailKey) {
-        const oldObjectKey = this.extractObjectKey(this.currentThumbnailKey);
-        if (oldObjectKey) {
-          deleteObs = this.dmsService.delete(oldObjectKey).pipe(catchError(() => of(null)));
-        }
+      const oldObjectKey =
+        this.removedThumbnailObjectKey ||
+        (this.currentThumbnailKey ? this.extractObjectKey(this.currentThumbnailKey) : null);
+      if (oldObjectKey) {
+        deleteObs = this.dmsService.delete(oldObjectKey).pipe(catchError(() => of(null)));
       }
 
       uploadObs = deleteObs.pipe(
@@ -431,7 +451,7 @@ export class CreateNewsComponent implements OnInit {
         }),
       );
     } else if (isFileRemoved && this.isEditMode) {
-      const oldObjectKey = this.extractObjectKey(this.currentThumbnailKey);
+      const oldObjectKey = this.removedThumbnailObjectKey;
       if (oldObjectKey) {
         uploadObs = this.dmsService.delete(oldObjectKey).pipe(
           switchMap(() => of('')), // Trả về chuỗi rỗng để backend xóa field thumbnail
@@ -459,6 +479,7 @@ export class CreateNewsComponent implements OnInit {
       .subscribe({
         next: () => {
           this.submitting = false;
+          this.removedThumbnailObjectKey = null;
           const needApprovalNotice =
             !this.isEditMode && this.intendedSubmitStatus === 'PENDING' && !this.canApproveLevel2;
 
@@ -489,6 +510,10 @@ export class CreateNewsComponent implements OnInit {
           console.error('Submit error:', err);
         },
       });
+  }
+
+  private hasThumbnail(): boolean {
+    return !!(this.selectedFile || this.thumbnailPreview || this.currentThumbnailKey);
   }
 
   closeApprovalNoticePopup(): void {

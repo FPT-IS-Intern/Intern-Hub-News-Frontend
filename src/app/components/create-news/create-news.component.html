@@ -189,7 +189,7 @@
       <div class="card thumbnail-card">
         <div class="card-header">
           <app-icon class="card-icon" icon="dsi-image-01-line"></app-icon>
-          <span class="card-title">Ảnh bìa</span>
+          <span class="card-title">Ảnh bìa <span class="required-star">*</span></span>
           @if (thumbnailPreview) {
             <app-button-container
               content="Xóa"
@@ -252,6 +252,9 @@
             class="hidden-input"
             (change)="onFileInputChange($event)"
           />
+          @if (thumbnailError) {
+            <span class="error-msg">{{ thumbnailError }}</span>
+          }
         </div>
       </div>
 
@@ -264,9 +267,7 @@
         <div class="card-body">
           <!-- Topic -->
           <div class="field-group">
-            <label class="field-label"
-              >Chủ đề <span class="label-hint">(không bắt buộc)</span></label
-            >
+            <label class="field-label">Chủ đề <span class="required-star">*</span></label>
             <div
               class="dropdown-container"
               [class.is-open]="showTopicDropdown"
@@ -317,6 +318,9 @@
                 </div>
               }
             </div>
+            @if (topicError) {
+              <span class="error-msg">{{ topicError }}</span>
+            }
           </div>
         </div>
       </div>
