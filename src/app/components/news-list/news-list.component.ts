@@ -25,7 +25,7 @@ export class NewsListComponent implements OnInit {
   searchResults: NewsResponse[] = [];
   isSearching = false;
 
-  sortColumn = 'created_at';
+  sortColumn = 'updated_at';
   sortDirection = 'desc';
 
   constructor(
@@ -52,8 +52,8 @@ export class NewsListComponent implements OnInit {
   loadData(): void {
     if (this.isSearching) return;
 
-    // 1. Fetch Featured News (Typically always by date/featured status, but we'll apply sort if applicable)
-    this.newsService.getAllFeatured(0, 5, this.sortColumn, this.sortDirection).subscribe({
+    // 1. Fetch latest approved news for hero section
+    this.newsService.getApprovedNews(0, 5, this.sortColumn, this.sortDirection).subscribe({
       next: (res) => {
         const items = res.data?.items || [];
         if (items.length > 0) {
