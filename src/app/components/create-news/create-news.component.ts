@@ -78,6 +78,7 @@ export class CreateNewsComponent implements OnInit {
   private approvalPopupNavigateUrl = '/ticket/my-ticket';
   private canApproveLevel2 = false;
   private intendedSubmitStatus: 'PENDING' | 'DRAFT' | 'APPROVED' | null = null;
+  private pendingDisplayStatus: 'PENDING' | 'DRAFT' | 'APPROVED' | null = null;
 
   private readonly s3DomainUrl = getS3DomainUrl();
 
@@ -231,6 +232,10 @@ export class CreateNewsComponent implements OnInit {
   }
 
   getStatusName(): string {
+    if (this.pendingDisplayStatus) {
+      return this.mapModeToStatusLabel(this.pendingDisplayStatus);
+    }
+
     const statusId = this.form.get('statusId')?.value;
     if (!statusId) return this.isEditMode ? 'Chờ duyệt' : 'Nháp';
     const status = this.statuses.find((s) => s.id === statusId);
@@ -370,6 +375,7 @@ export class CreateNewsComponent implements OnInit {
         ? (this.canApproveLevel2 ? 'APPROVED' : 'PENDING')
         : 'DRAFT';
     this.intendedSubmitStatus = targetMode;
+    this.pendingDisplayStatus = targetMode;
 
     let status = this.findStatusByMode(targetMode);
 
@@ -385,6 +391,7 @@ export class CreateNewsComponent implements OnInit {
         targetMode,
         statuses: this.statuses?.map((s) => s?.name),
       });
+      this.pendingDisplayStatus = null;
       return;
     }
 
@@ -479,6 +486,7 @@ export class CreateNewsComponent implements OnInit {
       .subscribe({
         next: () => {
           this.submitting = false;
+          this.pendingDisplayStatus = null;
           this.removedThumbnailObjectKey = null;
           const needApprovalNotice =
             !this.isEditMode && this.intendedSubmitStatus === 'PENDING' && !this.canApproveLevel2;
@@ -507,6 +515,7 @@ export class CreateNewsComponent implements OnInit {
         },
         error: (err) => {
           this.submitting = false;
+          this.pendingDisplayStatus = null;
           console.error('Submit error:', err);
         },
       });
@@ -655,6 +664,16 @@ export class CreateNewsComponent implements OnInit {
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/Đ/g, 'D')
       .replace(/\s+/g, ' ');
+  }
+
+  private mapModeToStatusLabel(mode: 'PENDING' | 'DRAFT' | 'APPROVED'): string {
+    if (mode === 'APPROVED') {
+      return 'Đã duyệt';
+    }
+    if (mode === 'PENDING') {
+      return 'Chờ duyệt';
+    }
+    return 'Nháp';
   }
 }
 
