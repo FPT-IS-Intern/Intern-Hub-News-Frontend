@@ -84,6 +84,9 @@
         <div class="category-content">
           <article *ngFor="let post of category.posts" class="category-article" [routerLink]="['/news', post.id]">
             <h4 class="article-title">{{ post.title }}</h4>
+            <div class="article-thumb">
+              <img [src]="post.thumbNail | fileUrl" alt="category-thumb" />
+            </div>
           </article>
         </div>
       </div>
