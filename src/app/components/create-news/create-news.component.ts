@@ -78,7 +78,7 @@ export class CreateNewsComponent implements OnInit {
   private approvalPopupNavigateUrl = '/ticket/my-ticket';
   private canApproveLevel2 = false;
   private intendedSubmitStatus: 'PENDING' | 'DRAFT' | 'APPROVED' | null = null;
-  private pendingDisplayStatus: 'PENDING' | 'DRAFT' | 'APPROVED' | null = null;
+  private displayStatusLabel = 'Nháp';
 
   private readonly s3DomainUrl = getS3DomainUrl();
 
@@ -117,7 +117,9 @@ export class CreateNewsComponent implements OnInit {
     if (this.newsId && this.newsId !== 'create-news') {
       this.isEditMode = true;
       this.loadNewsData(this.newsId);
+      return;
     }
+    this.displayStatusLabel = 'Nháp';
   }
 
   private loadNewsData(id: string): void {
@@ -152,6 +154,7 @@ export class CreateNewsComponent implements OnInit {
           this.removedThumbnailObjectKey = null;
           this.thumbnailTouched = false;
           this.thumbnailPreview = ImageUtils.getFileUrl(news.thumbNail);
+          this.displayStatusLabel = this.mapRawStatusToLabel(news.status);
           this.cdr.markForCheck();
         }
       },
@@ -232,19 +235,7 @@ export class CreateNewsComponent implements OnInit {
   }
 
   getStatusName(): string {
-    if (this.pendingDisplayStatus) {
-      return this.mapModeToStatusLabel(this.pendingDisplayStatus);
-    }
-
-    const statusId = this.form.get('statusId')?.value;
-    if (!statusId) return this.isEditMode ? 'Chờ duyệt' : 'Nháp';
-    const status = this.statuses.find((s) => s.id === statusId);
-    if (!status) return 'Nháp';
-    const name = this.normalizeStatusName(status.name);
-    if (name === 'APPROVE' || name === 'QUYET DINH DANG') return 'Đã duyệt';
-    if (name === 'PENDING' || name === 'CHO DUYET') return 'Chờ duyệt';
-    if (name === 'DRAFT' || name === 'BAN NHAP' || name === 'NHAP') return 'Nháp';
-    return status.name || 'Nháp';
+    return this.displayStatusLabel;
   }
 
   get selectedTopicNames(): string {
@@ -375,7 +366,6 @@ export class CreateNewsComponent implements OnInit {
         ? (this.canApproveLevel2 ? 'APPROVED' : 'PENDING')
         : 'DRAFT';
     this.intendedSubmitStatus = targetMode;
-    this.pendingDisplayStatus = targetMode;
 
     let status = this.findStatusByMode(targetMode);
 
@@ -391,7 +381,6 @@ export class CreateNewsComponent implements OnInit {
         targetMode,
         statuses: this.statuses?.map((s) => s?.name),
       });
-      this.pendingDisplayStatus = null;
       return;
     }
 
@@ -411,8 +400,12 @@ export class CreateNewsComponent implements OnInit {
     });
 
     this.thumbnailTouched = true;
-    if (!this.hasThumbnail()) return;
-    if (this.form.invalid) return;
+    if (!this.hasThumbnail()) {
+      return;
+    }
+    if (this.form.invalid) {
+      return;
+    }
 
     this.submitting = true;
     const values = this.form.value;
@@ -486,8 +479,10 @@ export class CreateNewsComponent implements OnInit {
       .subscribe({
         next: () => {
           this.submitting = false;
-          this.pendingDisplayStatus = null;
           this.removedThumbnailObjectKey = null;
+          if (this.intendedSubmitStatus) {
+            this.displayStatusLabel = this.mapModeToStatusLabel(this.intendedSubmitStatus);
+          }
           const needApprovalNotice =
             !this.isEditMode && this.intendedSubmitStatus === 'PENDING' && !this.canApproveLevel2;
 
@@ -515,7 +510,6 @@ export class CreateNewsComponent implements OnInit {
         },
         error: (err) => {
           this.submitting = false;
-          this.pendingDisplayStatus = null;
           console.error('Submit error:', err);
         },
       });
@@ -671,6 +665,17 @@ export class CreateNewsComponent implements OnInit {
       return 'Đã duyệt';
     }
     if (mode === 'PENDING') {
+      return 'Chờ duyệt';
+    }
+    return 'Nháp';
+  }
+
+  private mapRawStatusToLabel(statusName: string | null | undefined): string {
+    const normalized = this.normalizeStatusName(statusName);
+    if (normalized === 'APPROVE' || normalized === 'APPROVED' || normalized === 'QUYET DINH DANG' || normalized === 'DA DUYET') {
+      return 'Đã duyệt';
+    }
+    if (normalized === 'PENDING' || normalized === 'CHO DUYET') {
       return 'Chờ duyệt';
     }
     return 'Nháp';
