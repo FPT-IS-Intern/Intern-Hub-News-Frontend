@@ -91,7 +91,7 @@
                 </span>
               </td>
               <td>{{ data.createdAt | date: 'dd/MM/yyyy' }}</td>
-              <td>Admin</td>
+              <td>{{ getAuthorName(data) }}</td>
               <td>
                 <div class="action-btns">
                   <button class="action-btn view-btn" title="Xem/Sửa">

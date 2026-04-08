@@ -6,9 +6,11 @@ import {
   DatePickerComponent, 
   IconComponent 
 } from '@goat-bravos/intern-hub-layout';
+import { forkJoin, map, of } from 'rxjs';
 import { NewsService } from '../../services/news.service';
 import { NewsResponse } from '../../models/news';
 import { PopUpConfirmComponent } from '../pop-up-confirm/pop-up-confirm.component';
+import { UserProfileService } from '../../services/user-profile.service';
 
 @Component({
   selector: 'app-admin-news-dashboard',
@@ -27,6 +29,7 @@ import { PopUpConfirmComponent } from '../pop-up-confirm/pop-up-confirm.componen
 })
 export class AdminNewsDashboardComponent implements OnInit {
   newsList: NewsResponse[] = [];
+  authorNameMap: Record<string, string> = {};
   total = 0;
   pageSize = 10;
   pageIndex = 1;
@@ -41,6 +44,7 @@ export class AdminNewsDashboardComponent implements OnInit {
 
   constructor(
     private readonly newsService: NewsService,
+    private readonly userProfileService: UserProfileService,
     private readonly cdr: ChangeDetectorRef
   ) {}
 
@@ -63,11 +67,62 @@ export class AdminNewsDashboardComponent implements OnInit {
     ).subscribe({
       next: (res) => {
         this.newsList = res.data?.items || [];
+        this.resolveAuthorNames(this.newsList);
         this.total = Number(res.data?.totalItems) || 0;
         this.loading = false;
       },
       error: () => {
         this.loading = false;
+      },
+    });
+  }
+
+  getAuthorName(news: NewsResponse): string {
+    const directName = (news.createdByName || news.fullName || '').trim();
+    if (directName) {
+      return directName;
+    }
+
+    const cachedName = this.authorNameMap[news.id];
+    if (cachedName) {
+      return cachedName;
+    }
+
+    return news.createdBy != null ? String(news.createdBy) : '-';
+  }
+
+  private resolveAuthorNames(items: NewsResponse[]): void {
+    if (!items.length) {
+      this.authorNameMap = {};
+      return;
+    }
+
+    const requests = items.map((item) => {
+      const directName = (item.createdByName || item.fullName || '').trim();
+      if (directName) {
+        return of({ id: item.id, name: directName });
+      }
+
+      if (item.createdBy == null) {
+        return of({ id: item.id, name: '-' });
+      }
+
+      return this.userProfileService.getFullNameByUserId(String(item.createdBy)).pipe(
+        map((name) => ({ id: item.id, name: name || String(item.createdBy) })),
+      );
+    });
+
+    forkJoin(requests).subscribe({
+      next: (results) => {
+        const nextMap: Record<string, string> = {};
+        results.forEach((result) => {
+          nextMap[result.id] = result.name;
+        });
+        this.authorNameMap = nextMap;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.authorNameMap = {};
       },
     });
   }
