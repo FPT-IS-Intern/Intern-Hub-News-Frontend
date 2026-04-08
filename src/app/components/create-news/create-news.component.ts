@@ -326,7 +326,7 @@ export class CreateNewsComponent implements OnInit {
       globalThis.alert('Kích thước ảnh không được vượt quá 5MB.');
       return;
     }
-    this.selectedFile = file;
+    this.selectedFile = this.createUniqueUploadFile(file);
     this.thumbnailTouched = true;
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -335,6 +335,31 @@ export class CreateNewsComponent implements OnInit {
       this.cdr.markForCheck();
     };
     reader.readAsDataURL(file);
+  }
+
+  private createUniqueUploadFile(file: File): File {
+    const uniqueName = this.buildUniqueFileName(file.name);
+    return new File([file], uniqueName, {
+      type: file.type,
+      lastModified: file.lastModified,
+    });
+  }
+
+  private buildUniqueFileName(originalName: string): string {
+    const extIndex = originalName.lastIndexOf('.');
+    const hasExt = extIndex > 0 && extIndex < originalName.length - 1;
+    const rawBase = hasExt ? originalName.slice(0, extIndex) : originalName;
+    const ext = hasExt ? originalName.slice(extIndex) : '';
+    const safeBase = (rawBase || 'thumbnail')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9_-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .toLowerCase()
+      .slice(0, 60) || 'thumbnail';
+    const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    return `${safeBase}-${uniqueSuffix}${ext}`;
   }
 
   removeThumbnail(): void {
