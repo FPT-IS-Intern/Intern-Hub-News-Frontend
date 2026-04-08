@@ -157,10 +157,33 @@
   line-height: 1.8;
   color: var(--neutral-color-800);
   animation: fadeInUp 1.3s ease-out;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
 }
 
 :host ::ng-deep .news-content-body p {
   margin-bottom: 24px;
+}
+
+:host ::ng-deep .news-content-body img,
+:host ::ng-deep .news-content-body video,
+:host ::ng-deep .news-content-body iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+:host ::ng-deep .news-content-body table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+:host ::ng-deep .news-content-body pre,
+:host ::ng-deep .news-content-body code {
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .glass-card {
