@@ -35,9 +35,7 @@
         <p class="news-description">{{ news.shortDescription }}</p>
       }
 
-      <div class="news-content-body">
-        {{ news.body }}
-      </div>
+      <div class="news-content-body" [innerHTML]="news.body"></div>
     </article>
   </div>
 } @else {

@@ -52,8 +52,8 @@ export class NewsListComponent implements OnInit {
   loadData(): void {
     if (this.isSearching) return;
 
-    // 1. Fetch latest approved news for hero section
-    this.newsService.getApprovedNews(0, 5, this.sortColumn, this.sortDirection).subscribe({
+    // 1. Fetch featured news for hero section (only records marked as featured)
+    this.newsService.getAllFeatured(0, 5, this.sortColumn, this.sortDirection).subscribe({
       next: (res) => {
         const items = res.data?.items || [];
         if (items.length > 0) {
@@ -73,11 +73,11 @@ export class NewsListComponent implements OnInit {
         if (topics.length === 0) return of([]);
 
         const requests = topics.map(topic => 
-          this.newsService.getApprovedNewsByTopic(topic.id, 0, 4, this.sortColumn, this.sortDirection).pipe(
+          this.newsService.getApprovedNewsByTopic(topic.id, 0, 10, this.sortColumn, this.sortDirection).pipe(
             map(newsRes => ({
               id: topic.id,
               name: topic.name,
-              posts: newsRes.data?.items || []
+              posts: (newsRes.data?.items || []).filter(post => !post.featured).slice(0, 4)
             }))
           )
         );

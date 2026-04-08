@@ -156,12 +156,11 @@
   font-size: 18px;
   line-height: 1.8;
   color: var(--neutral-color-800);
-  white-space: pre-line;
   animation: fadeInUp 1.3s ease-out;
-  
-  p {
-    margin-bottom: 24px;
-  }
+}
+
+:host ::ng-deep .news-content-body p {
+  margin-bottom: 24px;
 }
 
 .glass-card {
