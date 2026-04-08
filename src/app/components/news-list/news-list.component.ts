@@ -25,8 +25,11 @@ export class NewsListComponent implements OnInit {
   searchResults: NewsResponse[] = [];
   isSearching = false;
 
-  sortColumn = 'updated_at';
-  sortDirection = 'desc';
+  readonly defaultSortColumn = 'created_at';
+  readonly defaultSortDirection = 'desc';
+
+  sortColumn = this.defaultSortColumn;
+  sortDirection = this.defaultSortDirection;
 
   constructor(
     private readonly newsService: NewsService,
@@ -106,7 +109,17 @@ export class NewsListComponent implements OnInit {
       this.sortColumn = column;
       this.sortDirection = 'asc';
     }
-    
+
+    this.reloadWithCurrentSort();
+  }
+
+  resetSort(): void {
+    this.sortColumn = this.defaultSortColumn;
+    this.sortDirection = this.defaultSortDirection;
+    this.reloadWithCurrentSort();
+  }
+
+  private reloadWithCurrentSort(): void {
     if (this.isSearching && this.searchControl.value) {
       this.performSearch(this.searchControl.value);
     } else {

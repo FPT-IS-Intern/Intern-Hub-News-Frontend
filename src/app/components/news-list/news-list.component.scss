@@ -61,6 +61,24 @@
       font-weight: 600;
       color: var(--neutral-color-500);
     }
+
+    .reset-sort-btn {
+      padding: 8px 16px;
+      border-radius: 50px;
+      border: 1px dashed var(--neutral-color-300);
+      background: var(--neutral-color-50);
+      color: var(--neutral-color-600);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: var(--brand-400);
+        color: var(--brand-600);
+        background: var(--brand-50);
+      }
+    }
   }
 
   .sort-options {
