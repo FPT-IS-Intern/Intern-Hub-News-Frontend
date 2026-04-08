@@ -9,4 +9,7 @@ export interface NewsResponse {
   featured: boolean;
   createdAt: number;
   updatedAt: number;
+  createdBy?: string | number;
+  createdByName?: string;
+  fullName?: string;
 }
