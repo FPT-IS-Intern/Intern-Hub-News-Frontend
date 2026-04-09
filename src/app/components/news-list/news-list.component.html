@@ -3,9 +3,9 @@
   <div class="sort-bar">
     <div class="search-container">
       <i class="fas fa-search search-icon"></i>
-      <input 
-        type="text" 
-        [formControl]="searchControl" 
+      <input
+        type="text"
+        [formControl]="searchControl"
         placeholder="Tìm kiếm tin tức bài đăng..."
         class="search-input"
       />
@@ -23,7 +23,18 @@
           <span *ngIf="sortColumn === 'title'">{{ sortDirection === 'desc' ? '↓' : '↑' }}</span>
         </button>
       </div>
-      <button class="reset-sort-btn" type="button" (click)="resetSort()">Refresh</button>
+      <app-button-container
+        class="reset-sort-btn"
+        (buttonClick)="resetSort()"
+        backgroundColor="var(--brand-500)"
+        color="var(--neutral-color-10)"
+        leftIcon="dsi-refresh-ccw-02-line"
+        borderRadius="8px"
+        width="55px"
+        height="33px"
+        border="none"
+      >
+      </app-button-container>
     </div>
   </div>
 
@@ -33,7 +44,7 @@
       <h2>Kết quả tìm kiếm cho: "{{ searchControl.value }}"</h2>
       <p class="results-count">Tìm thấy {{ searchResults.length }} bài viết</p>
     </div>
-    
+
     <div class="results-grid">
       <article *ngFor="let item of searchResults" class="result-card" [routerLink]="['/news', item.id]">
         <div class="result-thumb">

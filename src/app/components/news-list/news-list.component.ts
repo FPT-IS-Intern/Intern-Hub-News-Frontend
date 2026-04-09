@@ -7,11 +7,12 @@ import { NewsService } from '../../services/news.service';
 import { NewsTopicService } from '../../services/news-topic.service';
 import { NewsResponse } from '../../models/news';
 import { FileUrlPipe } from '../../utils/file-url.pipe';
+import { IconComponent, ButtonContainerComponent } from '@goat-bravos/intern-hub-layout';
 
 @Component({
   selector: 'app-news-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterLink, ReactiveFormsModule, FileUrlPipe],
+  imports: [CommonModule, RouterModule, RouterLink, ReactiveFormsModule, FileUrlPipe, ButtonContainerComponent],
   templateUrl: './news-list.component.html',
   styleUrl: './news-list.component.scss',
 })

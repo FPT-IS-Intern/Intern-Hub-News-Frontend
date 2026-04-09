@@ -2,6 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NewsResponse } from '../../../models/news/news-response.model';
 import { NewsService } from '@services/news.service';
+import {
+  ButtonContainerComponent,
+  InputTextComponent,
+} from '@goat-bravos/intern-hub-layout';
+
 
 @Component({
   selector: 'app-news-list',
